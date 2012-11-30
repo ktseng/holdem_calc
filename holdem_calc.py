@@ -228,7 +228,7 @@ def detect_hand(hole_cards, given_board):
     # Check to see if there is a three of a kind
     if current_max == 3:
         return 3, max_val, detect_three_of_a_kind_kickers(histogram_board)
-    if current_max == 2 and second_max == 2:
+    if current_max == 2:
         # Check to see if there is a two pair
         if second_max == 2:
             return 2, max_val, second_max_val, detect_highest_kicker(
