@@ -275,10 +275,9 @@ def main():
     random.seed(time.time())
     # Create results data structures which tracks results of comparisons
     num_players = len(hole_cards)
-    result_list, stats_list = [], [0] * (num_players + 1)
+    result_list, stats_list = [None] * num_players, [0] * (num_players + 1)
     result_histograms = []
     for player in xrange(num_players):
-        result_list.append([])
         result_histograms.append([0] * 10)
     # Run num_iterations simulations
     for i in xrange(num_iterations):
