@@ -3,6 +3,7 @@ import sys
 import time
 
 # Global variables
+num_iterations = 1000000
 suit_index_dict = {"s": 0, "c": 1, "h": 2, "d": 3}
 reverse_suit_index = ("s", "c", "h", "d")
 val_string = "23456789TJQKA"
@@ -280,7 +281,6 @@ def main():
         result_list.append([])
         result_histograms.append([0] * 10)
     # Run num_iterations simulations
-    num_iterations = 1000000
     for i in xrange(num_iterations):
         # Generate a random board from the cards left in the deck
         board = random.sample(deck, 5)
