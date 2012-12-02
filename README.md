@@ -1,6 +1,8 @@
 Holdem Calculator
 =================
 
+The Holdem Calculator library calculates the probability that a certain Texas Hold'em hand will win by running a Monte Carlo simulation. It also shows you how likely each set of hole cards is to make a certain poker hand. Numbers are generally accurate to the nearest percent. Accuracy can be improved by increasing the number of simulations that are run, but this will result in a longer running time.
+
 Usage
 -----
 
