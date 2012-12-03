@@ -2,7 +2,6 @@ import sys
 
 
 # Global variables
-num_iterations = 1000000
 suit_index_dict = {"s": 0, "c": 1, "h": 2, "d": 3}
 reverse_suit_index = ("s", "c", "h", "d")
 val_string = "23456789TJQKA"
@@ -93,7 +92,7 @@ def generate_histogram_board(flat_board):
             if frequency >= current_max:
                 second_max, second_max_val = current_max, max_val
                 current_max, max_val = frequency, val
-            elif frequency > second_max:
+            elif frequency >= second_max:
                 second_max, second_max_val = frequency, val
     return board, (current_max, max_val), (second_max, second_max_val)
 
@@ -191,6 +190,8 @@ def get_high_cards(histogram_board):
 def detect_hand(hole_cards, given_board):
     # Pre-processing
     flat_board = given_board[:]
+    if isinstance(given_board, tuple):
+        flat_board = list(flat_board)
     for hole_card in hole_cards:
         flat_board.append(hole_card)
     suit_board = None
@@ -252,12 +253,12 @@ def compare_hands(result_list):
 
 
 # Print results
-def print_results(hole_cards, winner_list, num_iterations, result_histograms):
-    float_iterations = float(num_iterations)
+def print_results(hole_cards, winner_list, result_histograms):
+    float_iterations = float(sum(winner_list))
     print "Winning Percentages:"
     for index, hole_card in enumerate(hole_cards):
         print hole_card, ": ", float(winner_list[index + 1]) / float_iterations
-    print "Ties: ", float(winner_list[0]) / float(num_iterations), "\n"
+    print "Ties: ", float(winner_list[0]) / float_iterations, "\n"
     for player_index, histogram in enumerate(result_histograms):
         print "Player" + str(player_index + 1) + " Histogram: "
         for index, elem in enumerate(histogram):
