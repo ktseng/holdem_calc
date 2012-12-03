@@ -103,10 +103,10 @@ def detect_straight_flush(board):
 
 
 # Returns the highest kicker available
-def detect_highest_kicker(histogram_board):
+def detect_highest_quad_kicker(histogram_board):
     index = len(histogram_board) - 1
     while index >= 0:
-        if histogram_board[index][1] == 1:
+        if histogram_board[index][1] < 4:
             return histogram_board[index][0]
         index -= 1
 
@@ -149,6 +149,15 @@ def detect_three_of_a_kind_kickers(histogram_board):
                 kicker1 = histogram_board[index][0]
             else:
                 return kicker1, histogram_board[index][0]
+        index -= 1
+
+
+# Returns the highest kicker available
+def detect_highest_kicker(histogram_board):
+    index = len(histogram_board) - 1
+    while index >= 0:
+        if histogram_board[index][1] == 1:
+            return histogram_board[index][0]
         index -= 1
 
 
@@ -216,7 +225,7 @@ def detect_hand(hole_cards, given_board):
             return (9,) if result[1] == 14 else (8, result[1])
     # Check to see if there is a four of a kind
     if current_max == 4:
-        return 7, max_val, detect_highest_kicker(histogram_board)
+        return 7, max_val, detect_highest_quad_kicker(histogram_board)
     # Check to see if there is a full house
     if current_max == 3 and second_max >= 2:
         return 6, max_val, second_max_val
