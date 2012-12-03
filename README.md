@@ -6,7 +6,8 @@ The Holdem Calculator library calculates the probability that a certain Texas Ho
 Usage
 -----
 
-	$ python holdem_calc.py As Ks Qc QdWinning Percentages:
+	$ python holdem_calc.py As Ks Qc Qd
+	Winning Percentages:
 	(As, Ks) :  0.46104
 	(Qc, Qd) :  0.53494
 	Ties:  0.00402
