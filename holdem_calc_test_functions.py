@@ -1,3 +1,4 @@
+import random
 from holdem_functions import *
 
 
