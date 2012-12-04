@@ -62,8 +62,7 @@ def generate_deck(hole_cards):
 
 # Returns a board of cards all with suit = flush_index
 def generate_suit_board(flat_board, flush_index):
-    return [card for card in flat_board if
-                                suit_index_dict[card.suit] == flush_index]
+    return [card for card in flat_board if card.suit_index == flush_index]
 
 
 # Returns board in the following format: e.g. [2, 1, 1, 1] where:
