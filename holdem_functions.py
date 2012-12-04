@@ -133,7 +133,7 @@ def detect_straight(histogram_board):
         index -= 1
         if (index == 0 and last_value == 14 and
             contiguous_length == 4 and histogram_board[index][0] == 2):
-            return True, (5,)
+            return True, 5
         if contiguous_length == 5:
             return True, current_val + 3
     return False,
