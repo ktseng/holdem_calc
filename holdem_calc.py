@@ -1,14 +1,28 @@
 import random
 import time
+import itertools
 from holdem_functions import *
 
+deck = None
 num_iterations = 100000
+
+
+# Generating boards
+def generate_boards():
+    for iteration in xrange(num_iterations):
+        yield random.sample(deck, 5)
+
+
+# Generate all possible boards
+def generate_exhaustive_boards():
+    return itertools.combinations(deck, 5)
 
 
 # Driver function which parses the command line arguments into hole cards,
 # instantiates data structures to hold the intermediate results of the
 # simulations, performs num_iterations simulations, and prints the results
 def main():
+    global deck
     # Parse command line arguments into hole cards and create deck
     hole_cards = parse_cards()
     deck = generate_deck(hole_cards)
@@ -25,9 +39,7 @@ def main():
     for player in xrange(num_players):
         result_histograms.append([0] * 10)
     # Run num_iterations simulations
-    for i in xrange(num_iterations):
-        # Generate a random board from the cards left in the deck
-        board = random.sample(deck, 5)
+    for board in generate_boards():
         # Find the best possible poker hand given the created board and the
         # hole cards and save them in the results data structures
         for index, hole_card in enumerate(hole_cards):
@@ -38,7 +50,7 @@ def main():
         # Increment what hand each player made
         for index, result in enumerate(result_list):
             result_histograms[index][result[0]] += 1
-    print_results(hole_cards, winner_list, num_iterations, result_histograms)
+    print_results(hole_cards, winner_list, result_histograms)
 
 if __name__ == '__main__':
     start = time.time()
