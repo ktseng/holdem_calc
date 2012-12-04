@@ -8,7 +8,7 @@ num_iterations = 100000
 
 
 # Generating boards
-def generate_boards():
+def generate_random_boards():
     for iteration in xrange(num_iterations):
         yield random.sample(deck, 5)
 
@@ -39,6 +39,7 @@ def main():
     for player in xrange(num_players):
         result_histograms.append([0] * 10)
     # Run num_iterations simulations
+    generate_boards = generate_random_boards
     for board in generate_boards():
         # Find the best possible poker hand given the created board and the
         # hole cards and save them in the results data structures
