@@ -196,9 +196,8 @@ def get_high_cards(histogram_board):
 # High Card: (0, (high card, second high card, third high card, etc.))
 def detect_hand(hole_cards, given_board):
     # Pre-processing
-    flat_board = [card for card in given_board]
-    for hole_card in hole_cards:
-        flat_board.append(hole_card)
+    flat_board = list(given_board)
+    flat_board.extend(hole_cards)
     suit_board = None
     suit_histogram = generate_suit_histogram(flat_board)
     histogram_board, maximum, next_max = generate_histogram_board(flat_board)
