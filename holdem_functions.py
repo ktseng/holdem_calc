@@ -1,6 +1,5 @@
 import sys
 
-
 # Global variables
 suit_index_dict = {"s": 0, "c": 1, "h": 2, "d": 3}
 reverse_suit_index = ("s", "c", "h", "d")
@@ -198,9 +197,7 @@ def get_high_cards(histogram_board):
 # High Card: (0, (high card, second high card, third high card, etc.))
 def detect_hand(hole_cards, given_board):
     # Pre-processing
-    flat_board = given_board[:]
-    if isinstance(given_board, tuple):
-        flat_board = list(flat_board)
+    flat_board = [card for card in given_board]
     for hole_card in hole_cards:
         flat_board.append(hole_card)
     suit_board = None
