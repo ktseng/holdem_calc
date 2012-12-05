@@ -1,4 +1,3 @@
-import random
 import time
 import holdem_functions
 from multiprocessing import Process, Array
@@ -15,6 +14,8 @@ thread_iters = num_iterations / num_processes
 
 # Generating boards
 def generate_random_boards():
+    import random
+    random.seed(time.time())
     for iteration in xrange(thread_iters):
         yield random.sample(deck, 5)
 
@@ -51,7 +52,6 @@ def main():
     #    times each type of poker hand (e.g. flush, straight) was gotten
     # 2) winner_list: number of times each player wins the given round
     global winner_list, result_histograms, deck
-    random.seed(time.time())
     # Parse command line arguments into hole cards and create deck
     hole_cards = holdem_functions.parse_cards()
     num_players = len(hole_cards)
