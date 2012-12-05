@@ -125,12 +125,12 @@ def detect_straight(histogram_board):
         if next_val == current_val - 1:
             contiguous_length += 1
         else:
-            contiguous_length = 1
-            # Check to see if straight is even possible
+            # Fail fast if straight not possible
             if index <= 4:
                 if index == 4 and next_val == 5 and last_value == 14:
                     return True, 5
                 break
+            contiguous_length = 1
         if contiguous_length == 5:
             return True, current_val + 3
         index -= 1
@@ -184,7 +184,7 @@ def get_high_cards(histogram_board):
 
 
 # Return Values:
-# Royal Flush: (8, 14)
+# Royal Flush: (9,)
 # Straight Flush: (8, high card)
 # Four of a Kind: (7, quad card, kicker)
 # Full House: (6, trips card, pair card)
@@ -211,7 +211,7 @@ def detect_hand(hole_cards, given_board):
         suit_board = generate_suit_board(flat_board, flush_index)
         result = detect_straight(suit_board)
         if result[0]:
-            return 8, result[1]
+            return (8, result[1]) if result[1] != 14 else (9,)
         return 5, get_flush_high_cards(suit_board)
     # Check to see if there is a four of a kind
     if current_max == 4:
