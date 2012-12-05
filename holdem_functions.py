@@ -66,26 +66,13 @@ def generate_suit_board(flat_board, flush_index):
     for card in flat_board:
         if card.suit_index == flush_index:
             histogram[card.value - 2] += 1
-    # Overwriting histogram so we won't need to allocate another list
-    board_index = 0
-    for index, frequency in enumerate(histogram):
-        if frequency != 0:
-            val = index + 2
-            histogram[board_index] = val, frequency
-            board_index += 1
-    return histogram[:board_index]
+    return preprocess(histogram)
 
 
 # Modifies the provided histogram argument and returns its length
 def preprocess(histogram):
-    # Overwriting histogram so we won't need to allocate another list
-    board_index = 0
-    for index, frequency in enumerate(histogram):
-        if frequency != 0:
-            val = index + 2
-            histogram[board_index] = val, frequency
-            board_index += 1
-    return board_index
+    return [(index + 2, frequency) for index, frequency in
+                                        enumerate(histogram) if frequency != 0]
 
 
 # Takes an iterable sequence and returns two items in a tuple:
@@ -220,8 +207,7 @@ def detect_hand(hole_cards, given_board, suit_histogram, full_histogram):
     full_histogram = full_histogram[:]
     full_histogram[hole_card0.value - 2] += 1
     full_histogram[hole_card1.value - 2] += 1
-    board_index = preprocess(full_histogram)
-    histogram_board = full_histogram[:board_index]
+    histogram_board = preprocess(full_histogram)
 
     # Find which card value shows up the most and second most times
     current_max, max_val, second_max, second_max_val = 0, 0, 0, 0
