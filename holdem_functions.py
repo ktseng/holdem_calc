@@ -1,6 +1,6 @@
 import sys
 
-# Global variables
+# Constants
 suit_index_dict = {"s": 0, "c": 1, "h": 2, "d": 3}
 reverse_suit_index = ("s", "c", "h", "d")
 val_string = "23456789TJQKA"
@@ -77,17 +77,11 @@ def generate_suit_board(flat_board, flush_index):
     return histogram[:board_index]
 
 
-# Returns four items in a tuple:
-# 1: Four-item list: items correspond to a suit and how many times it occurs
-# 2: Sorted list of two-tuples formatted: (card value, number of occurrences)
-# 3: Two-tuple: (most number of times a card shows up, card value)
-# 4: Two-tuple: (2nd most number of times a card shows up, card value)
-def preprocess(flat_board):
-    suit_histogram, histogram = [0] * 4, [0] * 13
-    for card in flat_board:
-        histogram[card.value - 2] += 1
-        suit_histogram[card.suit_index] += 1
-    current_max, max_val, second_max, second_max_val = 0, 0, 0, 0
+# Returns three items in a tuple:
+# 1: length of histogram
+# 2: Two-tuple: (most number of times a card shows up, card value)
+# 3: Two-tuple: (2nd most number of times a card shows up, card value)
+def preprocess(histogram):
     # Overwriting histogram so we won't need to allocate another list
     board_index = 0
     for index, frequency in enumerate(histogram):
@@ -95,13 +89,18 @@ def preprocess(flat_board):
             val = index + 2
             histogram[board_index] = val, frequency
             board_index += 1
-            if frequency >= current_max:
-                second_max, second_max_val = current_max, max_val
-                current_max, max_val = frequency, val
-            elif frequency >= second_max:
-                second_max, second_max_val = frequency, val
-    return (suit_histogram, histogram[:board_index], (current_max, max_val),
-                                                   (second_max, second_max_val))
+    return board_index
+
+
+# Takes an iterable sequence and returns two items in a tuple:
+# 1: 4-long list showing how often each card suit appears in the sequence
+# 2: 13-long list showing how often each card value appears in the sequence
+def preprocess_board(flat_board):
+    suit_histogram, histogram = [0] * 4, [0] * 13
+    for card in flat_board:
+        histogram[card.value - 2] += 1
+        suit_histogram[card.suit_index] += 1
+    return suit_histogram, histogram
 
 
 # Returns the highest kicker available
@@ -123,13 +122,14 @@ def get_flush_high_cards(suit_board):
 # Returns tuple: (Is there a straight?, high card)
 def detect_straight(histogram_board):
     index = len(histogram_board) - 1
-    last_value = histogram_board[index][0]
-    contiguous_length = 1
+    last_value, contiguous_length = histogram_board[index][0], 1
     while index >= 1:
         current_val = histogram_board[index][0]
         next_val = histogram_board[index - 1][0]
         if next_val == current_val - 1:
             contiguous_length += 1
+            if contiguous_length == 5:
+                return True, current_val + 3
         else:
             # Fail fast if straight not possible
             if index <= 4:
@@ -137,8 +137,6 @@ def detect_straight(histogram_board):
                     return True, 5
                 break
             contiguous_length = 1
-        if contiguous_length == 5:
-            return True, current_val + 3
         index -= 1
     return False,
 
@@ -200,25 +198,44 @@ def get_high_cards(histogram_board):
 # Two Pair: (2, high pair card, low pair card, kicker)
 # Pair: (1, pair card, (kicker high card, kicker med card, kicker low card))
 # High Card: (0, (high card, second high card, third high card, etc.))
-def detect_hand(hole_cards, given_board):
+def detect_hand(hole_cards, given_board, suit_histogram, full_histogram):
     # Pre-processing
-    flat_board = list(given_board)
-    flat_board.extend(hole_cards)
-    suit_histogram, histogram_board, maximum, next_max = preprocess(flat_board)
-    (current_max, max_val), (second_max, second_max_val) = maximum, next_max
+    # Add hole cards to suit_histogram data structure
+    hole_card0, hole_card1 = hole_cards[0], hole_cards[1]
+    suit_histogram = suit_histogram[:]
+    suit_histogram[hole_card0.suit_index] += 1
+    suit_histogram[hole_card1.suit_index] += 1
     max_suit = max(suit_histogram)
 
-    # Find out the highest possible poker hand given the board + hole cards
     # Determine if flush possible. If yes, four of a kind and full house are
-    # impossible, so return royal/straight/regular flush.
+    # impossible, so return royal, straight, or regular flush.
     if max_suit >= 5:
         # Use detect_straight to find whether there is a royal/straight flush
+        flat_board = list(given_board)
+        flat_board.extend(hole_cards)
         flush_index = suit_histogram.index(max_suit)
         suit_board = generate_suit_board(flat_board, flush_index)
         result = detect_straight(suit_board)
         if result[0]:
             return (8, result[1]) if result[1] != 14 else (9,)
         return 5, get_flush_high_cards(suit_board)
+
+    # Add hole cards to histogram data structure and process it
+    full_histogram = full_histogram[:]
+    full_histogram[hole_card0.value - 2] += 1
+    full_histogram[hole_card1.value - 2] += 1
+    board_index = preprocess(full_histogram)
+    histogram_board = full_histogram[:board_index]
+
+    # Find which card value shows up the most and second most times
+    current_max, max_val, second_max, second_max_val = 0, 0, 0, 0
+    for item in histogram_board:
+        val, frequency = item[0], item[1]
+        if frequency >= current_max:
+            second_max, second_max_val = current_max, max_val
+            current_max, max_val = frequency, val
+        elif frequency >= second_max:
+            second_max, second_max_val = frequency, val
     # Check to see if there is a four of a kind
     if current_max == 4:
         return 7, max_val, detect_highest_quad_kicker(histogram_board)

@@ -1,7 +1,6 @@
-import random
 import time
 import itertools
-from holdem_functions import *
+import holdem_functions
 
 deck = None
 num_iterations = 100000
@@ -9,6 +8,8 @@ num_iterations = 100000
 
 # Generating boards
 def generate_random_boards():
+    import random
+    random.seed(time.time())
     for iteration in xrange(num_iterations):
         yield random.sample(deck, 5)
 
@@ -24,9 +25,8 @@ def generate_exhaustive_boards():
 def main():
     global deck
     # Parse command line arguments into hole cards and create deck
-    hole_cards = parse_cards()
-    deck = generate_deck(hole_cards)
-    random.seed(time.time())
+    hole_cards = holdem_functions.parse_cards()
+    deck = holdem_functions.generate_deck(hole_cards)
     # Create results data structures which tracks results of comparisons
     # 1) result_histograms: a list for each player that shows the number of
     #    times each type of poker hand (e.g. flush, straight) was gotten
@@ -43,15 +43,17 @@ def main():
     for board in generate_boards():
         # Find the best possible poker hand given the created board and the
         # hole cards and save them in the results data structures
+        suit_histogram, histogram = holdem_functions.preprocess_board(board)
         for index, hole_card in enumerate(hole_cards):
-            result_list[index] = detect_hand(hole_card, board)
+            result_list[index] = holdem_functions.detect_hand(hole_card, board,
+                                                     suit_histogram, histogram)
         # Find the winner of the hand and tabulate results
-        winner_index = compare_hands(result_list)
+        winner_index = holdem_functions.compare_hands(result_list)
         winner_list[winner_index] += 1
         # Increment what hand each player made
         for index, result in enumerate(result_list):
             result_histograms[index][result[0]] += 1
-    print_results(hole_cards, winner_list, result_histograms)
+    holdem_functions.print_results(hole_cards, winner_list, result_histograms)
 
 if __name__ == '__main__':
     start = time.time()
