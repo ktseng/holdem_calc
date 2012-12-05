@@ -1,6 +1,6 @@
 import random
 import time
-from holdem_functions import *
+import holdem_functions
 from multiprocessing import Process, Array
 
 deck = None
@@ -14,7 +14,7 @@ thread_iters = num_iterations / num_processes
 
 
 # Generating boards
-def generate_boards():
+def generate_random_boards():
     for iteration in xrange(thread_iters):
         yield random.sample(deck, 5)
 
@@ -28,13 +28,16 @@ def simulation_loop(num_players, deck, hole_cards, proc_id):
     for player in xrange(num_players):
         result_list.append([])
     # Run num_iterations simulations
+    generate_boards = generate_random_boards
     for board in generate_boards():
         # Find the best possible poker hand given the created board and the
         # hole cards and save them in the results data structures
+        suit_histogram, histogram = holdem_functions.preprocess_board(board)
         for index, hole_card in enumerate(hole_cards):
-            result_list[index] = detect_hand(hole_card, board)
+            result_list[index] = holdem_functions.detect_hand(hole_card, board,
+                                                     suit_histogram, histogram)
         # Find the winner of the hand and tabulate results
-        winner_index = compare_hands(result_list)
+        winner_index = holdem_functions.compare_hands(result_list)
         winner_list[proc_id * (num_players + 1) + winner_index] += 1
         # Increment what hand each player made
         for index, result in enumerate(result_list):
@@ -50,9 +53,9 @@ def main():
     global winner_list, result_histograms, deck
     random.seed(time.time())
     # Parse command line arguments into hole cards and create deck
-    hole_cards = parse_cards()
+    hole_cards = holdem_functions.parse_cards()
     num_players = len(hole_cards)
-    deck = generate_deck(hole_cards)
+    deck = holdem_functions.generate_deck(hole_cards)
     # Create data structures to manage multiple processes
     winner_list = Array('i', num_processes * (num_players + 1))
     result_histograms = Array('i', num_processes * num_players * 10)
@@ -75,7 +78,8 @@ def main():
     for index, element in enumerate(result_histograms):
         combined_histograms[(index / 10) % num_players][index % 10] += element
     # Print results
-    print_results(hole_cards, combined_winner_list, combined_histograms)
+    holdem_functions.print_results(hole_cards, combined_winner_list,
+                                                        combined_histograms)
 
 if __name__ == '__main__':
     start = time.time()
