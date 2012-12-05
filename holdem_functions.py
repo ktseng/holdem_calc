@@ -62,16 +62,19 @@ def generate_deck(hole_cards):
 
 # Returns a board of cards all with suit = flush_index
 def generate_suit_board(flat_board, flush_index):
-    histogram, board = [0] * 13, []
+    histogram = [0] * 13
     for card in flat_board:
         if card.suit_index == flush_index:
             histogram[card.value - 2] += 1
     current_max, max_val, second_max, second_max_val = 0, 0, 0, 0
+    # Overwriting histogram so we won't need to allocate another list
+    board_index = 0
     for index, frequency in enumerate(histogram):
         if frequency != 0:
             val = index + 2
-            board.append((val, frequency))
-    return board
+            histogram[board_index] = val, frequency
+            board_index += 1
+    return histogram[:board_index]
 
 
 # Returns four items in a tuple:
@@ -80,22 +83,25 @@ def generate_suit_board(flat_board, flush_index):
 # 3: Two-tuple: (most number of times a card shows up, card value)
 # 4: Two-tuple: (2nd most number of times a card shows up, card value)
 def preprocess(flat_board):
-    suit_histogram, histogram, board = [0] * 4, [0] * 13, []
+    suit_histogram, histogram = [0] * 4, [0] * 13
     for card in flat_board:
         histogram[card.value - 2] += 1
         suit_histogram[card.suit_index] += 1
     current_max, max_val, second_max, second_max_val = 0, 0, 0, 0
+    # Overwriting histogram so we won't need to allocate another list
+    board_index = 0
     for index, frequency in enumerate(histogram):
         if frequency != 0:
             val = index + 2
-            board.append((val, frequency))
+            histogram[board_index] = val, frequency
+            board_index += 1
             if frequency >= current_max:
                 second_max, second_max_val = current_max, max_val
                 current_max, max_val = frequency, val
             elif frequency >= second_max:
                 second_max, second_max_val = frequency, val
-    return (suit_histogram, board,
-            (current_max, max_val), (second_max, second_max_val))
+    return (suit_histogram, histogram[:board_index], (current_max, max_val),
+                                                   (second_max, second_max_val))
 
 
 # Returns the highest kicker available
