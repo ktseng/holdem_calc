@@ -95,13 +95,6 @@ def detect_highest_quad_kicker(histogram_board):
         index -= 1
 
 
-# Returns tuple: (Flush High card1, Flush High card2, Flush High card3, etc.)
-def get_flush_high_cards(suit_board):
-    result = [card[0] for card in suit_board[-5:]]
-    result.reverse()
-    return tuple(result)
-
-
 # Returns tuple: (Is there a straight?, high card)
 def detect_straight(histogram_board):
     index = len(histogram_board) - 1
@@ -201,7 +194,7 @@ def detect_hand(hole_cards, given_board, suit_histogram, full_histogram):
         result = detect_straight(suit_board)
         if result[0]:
             return (8, result[1]) if result[1] != 14 else (9,)
-        return 5, get_flush_high_cards(suit_board)
+        return 5, get_high_cards(suit_board)
 
     # Add hole cards to histogram data structure and process it
     full_histogram = full_histogram[:]
