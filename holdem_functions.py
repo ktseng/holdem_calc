@@ -66,7 +66,6 @@ def generate_suit_board(flat_board, flush_index):
     for card in flat_board:
         if card.suit_index == flush_index:
             histogram[card.value - 2] += 1
-    current_max, max_val, second_max, second_max_val = 0, 0, 0, 0
     # Overwriting histogram so we won't need to allocate another list
     board_index = 0
     for index, frequency in enumerate(histogram):
@@ -77,10 +76,7 @@ def generate_suit_board(flat_board, flush_index):
     return histogram[:board_index]
 
 
-# Returns three items in a tuple:
-# 1: length of histogram
-# 2: Two-tuple: (most number of times a card shows up, card value)
-# 3: Two-tuple: (2nd most number of times a card shows up, card value)
+# Modifies the provided histogram argument and returns its length
 def preprocess(histogram):
     # Overwriting histogram so we won't need to allocate another list
     board_index = 0
