@@ -62,26 +62,28 @@ def generate_deck(hole_cards):
 
 # Returns a board of cards all with suit = flush_index
 def generate_suit_board(flat_board, flush_index):
-    return [card for card in flat_board if card.suit_index == flush_index]
-
-
-# Returns board in the following format: e.g. [2, 1, 1, 1] where:
-# Index0 = Spades, Index1 = Clubs, Index2 = Hearts, Index4 = Diamonds
-def generate_suit_histogram(flat_board):
-    suit_histogram = [0] * 4
-    for card in flat_board:
-        suit_histogram[card.suit_index] += 1
-    return suit_histogram
-
-
-# Returns three items in a tuple:
-# 1: Sorted list of two-tuples formatted: (card value, number of occurrences)
-# 2: Two-tuple: (most number of times a card shows up, card value)
-# 3: Two-tuple: (2nd most number of times a card shows up, card value)
-def generate_histogram_board(flat_board):
     histogram, board = [0] * 13, []
     for card in flat_board:
+        if card.suit_index == flush_index:
+            histogram[card.value - 2] += 1
+    current_max, max_val, second_max, second_max_val = 0, 0, 0, 0
+    for index, frequency in enumerate(histogram):
+        if frequency != 0:
+            val = index + 2
+            board.append((val, frequency))
+    return board
+
+
+# Returns four items in a tuple:
+# 1: Four-item list: items correspond to a suit and how many times it occurs
+# 2: Sorted list of two-tuples formatted: (card value, number of occurrences)
+# 3: Two-tuple: (most number of times a card shows up, card value)
+# 4: Two-tuple: (2nd most number of times a card shows up, card value)
+def preprocess(flat_board):
+    suit_histogram, histogram, board = [0] * 4, [0] * 13, []
+    for card in flat_board:
         histogram[card.value - 2] += 1
+        suit_histogram[card.suit_index] += 1
     current_max, max_val, second_max, second_max_val = 0, 0, 0, 0
     for index, frequency in enumerate(histogram):
         if frequency != 0:
@@ -92,12 +94,8 @@ def generate_histogram_board(flat_board):
                 current_max, max_val = frequency, val
             elif frequency >= second_max:
                 second_max, second_max_val = frequency, val
-    return board, (current_max, max_val), (second_max, second_max_val)
-
-
-# Returns tuple: (Is there a straight flush?, straight flush high card)
-def detect_straight_flush(board):
-    return detect_straight(generate_histogram_board(board)[0])
+    return (suit_histogram, board,
+            (current_max, max_val), (second_max, second_max_val))
 
 
 # Returns the highest kicker available
@@ -111,8 +109,7 @@ def detect_highest_quad_kicker(histogram_board):
 
 # Returns tuple: (Flush High card1, Flush High card2, Flush High card3, etc.)
 def get_flush_high_cards(suit_board):
-    suit_board.sort(key=lambda card: card.value)
-    result = [card.value for card in suit_board[-5:]]
+    result = [card[0] for card in suit_board[-5:]]
     result.reverse()
     return tuple(result)
 
@@ -124,16 +121,19 @@ def detect_straight(histogram_board):
     contiguous_length = 1
     while index >= 1:
         current_val = histogram_board[index][0]
-        if histogram_board[index - 1][0] == current_val - 1:
+        next_val = histogram_board[index - 1][0]
+        if next_val == current_val - 1:
             contiguous_length += 1
         else:
             contiguous_length = 1
-        index -= 1
-        if (index == 0 and last_value == 14 and
-            contiguous_length == 4 and histogram_board[index][0] == 2):
-            return True, 5
+            # Check to see if straight is even possible
+            if index <= 4:
+                if index == 4 and next_val == 5 and last_value == 14:
+                    return True, 5
+                break
         if contiguous_length == 5:
             return True, current_val + 3
+        index -= 1
     return False,
 
 
@@ -184,7 +184,7 @@ def get_high_cards(histogram_board):
 
 
 # Return Values:
-# Royal Flush: (9,)
+# Royal Flush: (8, 14)
 # Straight Flush: (8, high card)
 # Four of a Kind: (7, quad card, kicker)
 # Full House: (6, trips card, pair card)
@@ -198,39 +198,32 @@ def detect_hand(hole_cards, given_board):
     # Pre-processing
     flat_board = list(given_board)
     flat_board.extend(hole_cards)
-    suit_board = None
-    suit_histogram = generate_suit_histogram(flat_board)
-    histogram_board, maximum, next_max = generate_histogram_board(flat_board)
-    current_max, max_val = maximum
-    second_max, second_max_val = next_max
-
-    ## Find out the highest possible poker hand given the board + hole cards
-    # Determine if flush possible at the top to minimize future work
-    result = None
+    suit_histogram, histogram_board, maximum, next_max = preprocess(flat_board)
+    (current_max, max_val), (second_max, second_max_val) = maximum, next_max
     max_suit = max(suit_histogram)
-    flush_possible = True if max_suit >= 5 else False
-    # If flush is possible, check if there is a royal flush or straight flush
-    if flush_possible:
-        # Royal flush is just a straight flush to the Ace, so we can re-use the
-        # detect_straight_flush() function
+
+    # Find out the highest possible poker hand given the board + hole cards
+    # Determine if flush possible. If yes, four of a kind and full house are
+    # impossible, so return royal/straight/regular flush.
+    if max_suit >= 5:
+        # Use detect_straight to find whether there is a royal/straight flush
         flush_index = suit_histogram.index(max_suit)
         suit_board = generate_suit_board(flat_board, flush_index)
-        result = detect_straight_flush(suit_board)
+        result = detect_straight(suit_board)
         if result[0]:
-            return (9,) if result[1] == 14 else (8, result[1])
+            return 8, result[1]
+        return 5, get_flush_high_cards(suit_board)
     # Check to see if there is a four of a kind
     if current_max == 4:
         return 7, max_val, detect_highest_quad_kicker(histogram_board)
     # Check to see if there is a full house
     if current_max == 3 and second_max >= 2:
         return 6, max_val, second_max_val
-    # Check to see if there is a flush
-    if flush_possible:
-        return 5, get_flush_high_cards(suit_board)
     # Check to see if there is a straight
-    result = detect_straight(histogram_board)
-    if result[0]:
-        return 4, result[1]
+    if len(histogram_board) >= 5:
+        result = detect_straight(histogram_board)
+        if result[0]:
+            return 4, result[1]
     # Check to see if there is a three of a kind
     if current_max == 3:
         return 3, max_val, detect_three_of_a_kind_kickers(histogram_board)
