@@ -8,35 +8,35 @@ Usage
 
 	$ python holdem_calc.py As Ks Qc Qd
 	Winning Percentages:
-	(As, Ks) :  0.46104
-	(Qc, Qd) :  0.53494
-	Ties:  0.00402
+	(As, Ks) :  0.45821
+	(Qc, Qd) :  0.53795
+	Ties:  0.00384
 
 	Player1 Histogram:
-	High Card :  0.1768
-	Pair :  0.42739
-	Two Pair :  0.22936
-	Three of a Kind :  0.04581
-	Straight :  0.02149
-	Flush :  0.0725
-	Full House :  0.02441
-	Four of a Kind :  0.00156
-	Straight Flush :  5e-05
-	Royal Flush :  0.00063
+	High Card :  0.17454
+	Pair :  0.43063
+	Two Pair :  0.22761
+	Three of a Kind :  0.04535
+	Straight :  0.02194
+	Flush :  0.07397
+	Full House :  0.02399
+	Four of a Kind :  0.00135
+	Straight Flush :  3e-05
+	Royal Flush :  0.00059
 
 	Player2 Histogram:
 	High Card :  0.0
-	Pair :  0.35462
-	Two Pair :  0.38988
-	Three of a Kind :  0.1206
-	Straight :  0.01591
-	Flush :  0.02278
-	Full House :  0.08671
-	Four of a Kind :  0.00923
-	Straight Flush :  0.00018
-	Royal Flush :  9e-05
+	Pair :  0.35173
+	Two Pair :  0.38824
+	Three of a Kind :  0.12356
+	Straight :  0.01602
+	Flush :  0.02289
+	Full House :  0.08773
+	Four of a Kind :  0.00964
+	Straight Flush :  8e-05
+	Royal Flush :  0.00011
 
 
-	Time elapsed(seconds):  2.17448210716
+	Time elapsed(seconds):  1.7265150547
 
 This usage pattern also applies for parallel_holdem_calc.py. You can add in as many players as you want, as long as the number of hole cards you provide is an even number.
