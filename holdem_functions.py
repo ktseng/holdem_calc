@@ -65,13 +65,13 @@ def generate_suit_board(flat_board, flush_index):
     histogram = [0] * 13
     for card in flat_board:
         if card.suit_index == flush_index:
-            histogram[card.value - 2] += 1
+            histogram[14 - card.value] += 1
     return preprocess(histogram)
 
 
 # Modifies the provided histogram argument and returns its length
 def preprocess(histogram):
-    return [(index + 2, frequency) for index, frequency in
+    return [(14 - index, frequency) for index, frequency in
                                         enumerate(histogram) if frequency != 0]
 
 
@@ -80,86 +80,77 @@ def preprocess(histogram):
 # 2: 13-long list showing how often each card value appears in the sequence
 def preprocess_board(flat_board):
     suit_histogram, histogram = [0] * 4, [0] * 13
+    # Reversing the order in histogram so in the future, we can traverse
+    # starting from index 0
     for card in flat_board:
-        histogram[card.value - 2] += 1
+        histogram[14 - card.value] += 1
         suit_histogram[card.suit_index] += 1
     return suit_histogram, histogram
 
 
 # Returns the highest kicker available
 def detect_highest_quad_kicker(histogram_board):
-    index = len(histogram_board) - 1
-    while index >= 0:
-        if histogram_board[index][1] < 4:
-            return histogram_board[index][0]
-        index -= 1
+    for elem in histogram_board:
+        if elem[1] < 4:
+            return elem[0]
 
 
 # Returns tuple: (Is there a straight?, high card)
 def detect_straight(histogram_board):
-    index = len(histogram_board) - 1
-    last_value, contiguous_length = histogram_board[index][0], 1
-    while index >= 1:
-        current_val = histogram_board[index][0]
-        next_val = histogram_board[index - 1][0]
+    high_value, contiguous_length = histogram_board[0][0], 1
+    fail_index = len(histogram_board) - 5
+    # Won't overflow list because we fail fast and check ahead
+    for index, elem in enumerate(histogram_board):
+        current_val, next_val = elem[0], histogram_board[index + 1][0]
         if next_val == current_val - 1:
             contiguous_length += 1
             if contiguous_length == 5:
                 return True, current_val + 3
         else:
             # Fail fast if straight not possible
-            if index <= 4:
-                if index == 4 and next_val == 5 and last_value == 14:
+            if index >= fail_index:
+                if index == fail_index and next_val == 5 and high_value == 14:
                     return True, 5
                 break
             contiguous_length = 1
-        index -= 1
     return False,
 
 
 # Returns tuple of the two highest kickers that result from the three of a kind
 def detect_three_of_a_kind_kickers(histogram_board):
-    index = len(histogram_board) - 1
     kicker1 = -1
-    while index >= 0:
-        if histogram_board[index][1] != 3:
+    for elem in histogram_board:
+        if elem[1] != 3:
             if kicker1 == -1:
-                kicker1 = histogram_board[index][0]
+                kicker1 = elem[0]
             else:
-                return kicker1, histogram_board[index][0]
-        index -= 1
+                return kicker1, elem[0]
 
 
 # Returns the highest kicker available
 def detect_highest_kicker(histogram_board):
-    index = len(histogram_board) - 1
-    while index >= 0:
-        if histogram_board[index][1] == 1:
-            return histogram_board[index][0]
-        index -= 1
+    for elem in histogram_board:
+        if elem[1] == 1:
+            return elem[0]
 
 
 # Returns tuple: (kicker1, kicker2, kicker3)
 def detect_pair_kickers(histogram_board):
-    # Iterate through the histogram board to see where two pair is
-    index = len(histogram_board) - 1
     kicker1, kicker2 = -1, -1
-    while index >= 0:
-        if histogram_board[index][1] != 2:
+    for elem in histogram_board:
+        if elem[1] != 2:
             if kicker1 == -1:
-                kicker1 = histogram_board[index][0]
+                kicker1 = elem[0]
             elif kicker2 == -1:
-                kicker2 = histogram_board[index][0]
+                kicker2 = elem[0]
             else:
-                return kicker1, kicker2, histogram_board[index][0]
-        index -= 1
+                return kicker1, kicker2, elem[0]
 
 
 # Returns a tuple of the five highest cards in the given board
 # Note: Requires a sorted board to be given as an argument
 def get_high_cards(histogram_board):
-    result = [elem[0] for elem in histogram_board[-5:]]
-    result.reverse()
+    result = [elem[0] for elem in histogram_board[:5]]
     return tuple(result)
 
 
@@ -198,19 +189,20 @@ def detect_hand(hole_cards, given_board, suit_histogram, full_histogram):
 
     # Add hole cards to histogram data structure and process it
     full_histogram = full_histogram[:]
-    full_histogram[hole_card0.value - 2] += 1
-    full_histogram[hole_card1.value - 2] += 1
+    full_histogram[14 - hole_card0.value] += 1
+    full_histogram[14 - hole_card1.value] += 1
     histogram_board = preprocess(full_histogram)
 
     # Find which card value shows up the most and second most times
     current_max, max_val, second_max, second_max_val = 0, 0, 0, 0
     for item in histogram_board:
         val, frequency = item[0], item[1]
-        if frequency >= current_max:
+        if frequency > current_max:
             second_max, second_max_val = current_max, max_val
             current_max, max_val = frequency, val
-        elif frequency >= second_max:
+        elif frequency > second_max:
             second_max, second_max_val = frequency, val
+
     # Check to see if there is a four of a kind
     if current_max == 4:
         return 7, max_val, detect_highest_quad_kicker(histogram_board)
@@ -230,7 +222,7 @@ def detect_hand(hole_cards, given_board, suit_histogram, full_histogram):
         if second_max == 2:
             return 2, max_val, second_max_val, detect_highest_kicker(
                                                             histogram_board)
-        # Check to see if there is a pair
+        # Return pair
         else:
             return 1, max_val, detect_pair_kickers(histogram_board)
     # Check for high cards
