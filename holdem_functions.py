@@ -97,8 +97,7 @@ def detect_highest_quad_kicker(histogram_board):
 
 # Returns tuple: (Is there a straight?, high card)
 def detect_straight(histogram_board):
-    high_value, contiguous_length = histogram_board[0][0], 1
-    fail_index = len(histogram_board) - 5
+    contiguous_length, fail_index = 1, len(histogram_board) - 5
     # Won't overflow list because we fail fast and check ahead
     for index, elem in enumerate(histogram_board):
         current_val, next_val = elem[0], histogram_board[index + 1][0]
@@ -109,7 +108,8 @@ def detect_straight(histogram_board):
         else:
             # Fail fast if straight not possible
             if index >= fail_index:
-                if index == fail_index and next_val == 5 and high_value == 14:
+                if (index == fail_index and next_val == 5 and
+                                        histogram_board[0][0] == 14):
                     return True, 5
                 break
             contiguous_length = 1
@@ -147,11 +147,10 @@ def detect_pair_kickers(histogram_board):
                 return kicker1, kicker2, elem[0]
 
 
-# Returns a tuple of the five highest cards in the given board
+# Returns a list of the five highest cards in the given board
 # Note: Requires a sorted board to be given as an argument
 def get_high_cards(histogram_board):
-    result = [elem[0] for elem in histogram_board[:5]]
-    return tuple(result)
+    return histogram_board[:5]
 
 
 # Return Values:
@@ -164,7 +163,7 @@ def get_high_cards(histogram_board):
 # Three of a Kind: (3, trips card, (kicker high card, kicker low card))
 # Two Pair: (2, high pair card, low pair card, kicker)
 # Pair: (1, pair card, (kicker high card, kicker med card, kicker low card))
-# High Card: (0, (high card, second high card, third high card, etc.))
+# High Card: (0, [high card, second high card, third high card, etc.])
 def detect_hand(hole_cards, given_board, suit_histogram, full_histogram):
     # Pre-processing
     # Add hole cards to suit_histogram data structure
