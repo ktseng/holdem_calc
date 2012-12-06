@@ -1,5 +1,4 @@
 import time
-import itertools
 import holdem_functions
 
 deck = None
@@ -16,6 +15,7 @@ def generate_random_boards():
 
 # Generate all possible boards
 def generate_exhaustive_boards():
+    import itertools
     return itertools.combinations(deck, 5)
 
 
