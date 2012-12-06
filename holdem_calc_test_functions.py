@@ -16,7 +16,8 @@ def parse_cards_test():
 # and will print out what hand we detect given these cards
 def main2():
     hole_cards, flat_board = parse_cards_test()
-    print detect_hand(hole_cards, flat_board)
+    suit_histogram, histogram = preprocess_board(flat_board)
+    print detect_hand(hole_cards, flat_board, suit_histogram, histogram)
 
 
 # Test function where you can specify one set of hole cards and will generate
@@ -24,11 +25,13 @@ def main2():
 def main3():
     hole_cards = parse_cards()
     deck = generate_deck(hole_cards)
-    num_iterations = 10000
+    num_iterations = 10
     for i in xrange(num_iterations):
         board = random.sample(deck, 5)
+        suit_histogram, histogram = preprocess_board(board)
         for index, hole_card in enumerate(hole_cards):
             print hole_card
             print board
-            print detect_hand(hole_card, board)
+            print detect_hand(hole_card, board, suit_histogram, histogram)
         print
+
