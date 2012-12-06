@@ -62,11 +62,10 @@ def generate_deck(hole_cards):
 
 # Returns a board of cards all with suit = flush_index
 def generate_suit_board(flat_board, flush_index):
-    histogram = [0] * 13
-    for card in flat_board:
-        if card.suit_index == flush_index:
-            histogram[14 - card.value] += 1
-    return preprocess(histogram)
+    histogram = [card.value for card in flat_board
+                                if card.suit_index == flush_index]
+    histogram.sort(reverse=True)
+    return histogram
 
 
 # Modifies the provided histogram argument and returns its length
@@ -86,6 +85,27 @@ def preprocess_board(flat_board):
         histogram[14 - card.value] += 1
         suit_histogram[card.suit_index] += 1
     return suit_histogram, histogram
+
+
+# Returns tuple: (Is there a straight flush?, high card)
+def detect_straight_flush(suit_board):
+    contiguous_length, fail_index = 1, len(suit_board) - 5
+    # Won't overflow list because we fail fast and check ahead
+    for index, elem in enumerate(suit_board):
+        current_val, next_val = elem, suit_board[index + 1]
+        if next_val == current_val - 1:
+            contiguous_length += 1
+            if contiguous_length == 5:
+                return True, current_val + 3
+        else:
+            # Fail fast if straight not possible
+            if index >= fail_index:
+                if (index == fail_index and next_val == 5 and
+                                                    suit_board[0] == 14):
+                    return True, 5
+                break
+            contiguous_length = 1
+    return False,
 
 
 # Returns the highest kicker available
@@ -158,7 +178,7 @@ def get_high_cards(histogram_board):
 # Straight Flush: (8, high card)
 # Four of a Kind: (7, quad card, kicker)
 # Full House: (6, trips card, pair card)
-# Flush: (5, (flush high card, flush second high card, ..., flush low card))
+# Flush: (5, [flush high card, flush second high card, ..., flush low card])
 # Straight: (4, high card)
 # Three of a Kind: (3, trips card, (kicker high card, kicker low card))
 # Two Pair: (2, high pair card, low pair card, kicker)
@@ -181,7 +201,7 @@ def detect_hand(hole_cards, given_board, suit_histogram, full_histogram):
         flat_board.extend(hole_cards)
         flush_index = suit_histogram.index(max_suit)
         suit_board = generate_suit_board(flat_board, flush_index)
-        result = detect_straight(suit_board)
+        result = detect_straight_flush(suit_board)
         if result[0]:
             return (8, result[1]) if result[1] != 14 else (9,)
         return 5, get_high_cards(suit_board)
