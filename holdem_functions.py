@@ -3,7 +3,7 @@ import sys
 # Constants
 suit_index_dict = {"s": 0, "c": 1, "h": 2, "d": 3}
 reverse_suit_index = ("s", "c", "h", "d")
-val_string = "23456789TJQKA"
+val_string = "AKQJT98765432"
 hand_rankings = ("High Card", "Pair", "Two Pair", "Three of a Kind",
                  "Straight", "Flush", "Full House", "Four of a Kind",
                  "Straight Flush", "Royal Flush")
@@ -188,23 +188,25 @@ def detect_hand(hole_cards, given_board, suit_histogram, full_histogram):
     # Pre-processing
     # Add hole cards to suit_histogram data structure
     hole_card0, hole_card1 = hole_cards[0], hole_cards[1]
-    suit_histogram = suit_histogram[:]
-    suit_histogram[hole_card0.suit_index] += 1
-    suit_histogram[hole_card1.suit_index] += 1
     max_suit = max(suit_histogram)
 
     # Determine if flush possible. If yes, four of a kind and full house are
     # impossible, so return royal, straight, or regular flush.
-    if max_suit >= 5:
-        # Use detect_straight to find whether there is a royal/straight flush
-        flat_board = list(given_board)
-        flat_board.extend(hole_cards)
+    if max_suit >= 3:
         flush_index = suit_histogram.index(max_suit)
-        suit_board = generate_suit_board(flat_board, flush_index)
-        result = detect_straight_flush(suit_board)
-        if result[0]:
-            return (8, result[1]) if result[1] != 14 else (9,)
-        return 5, get_high_cards(suit_board)
+        if hole_card0.suit_index == flush_index:
+            max_suit += 1
+        if hole_card1.suit_index == flush_index:
+            max_suit += 1
+        # Find whether there is a royal/straight flush
+        if max_suit >= 5:
+            flat_board = list(given_board)
+            flat_board.extend(hole_cards)
+            suit_board = generate_suit_board(flat_board, flush_index)
+            result = detect_straight_flush(suit_board)
+            if result[0]:
+                return (8, result[1]) if result[1] != 14 else (9,)
+            return 5, get_high_cards(suit_board)
 
     # Add hole cards to histogram data structure and process it
     full_histogram = full_histogram[:]
