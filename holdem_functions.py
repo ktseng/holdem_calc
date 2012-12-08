@@ -20,10 +20,10 @@ class Card:
         self.suit_index = suit_index_dict[self.suit]
 
     def __str__(self):
-        return val_string[self.value - 2] + self.suit
+        return val_string[14 - self.value] + self.suit
 
     def __repr__(self):
-        return val_string[self.value - 2] + self.suit
+        return val_string[14 - self.value] + self.suit
 
     def __eq__(self, other):
         return self.value == other.value and self.suit == other.suit
@@ -84,7 +84,7 @@ def preprocess_board(flat_board):
     for card in flat_board:
         histogram[14 - card.value] += 1
         suit_histogram[card.suit_index] += 1
-    return suit_histogram, histogram
+    return suit_histogram, histogram, max(suit_histogram)
 
 
 # Returns tuple: (Is there a straight flush?, high card)
@@ -184,11 +184,9 @@ def get_high_cards(histogram_board):
 # Two Pair: (2, high pair card, low pair card, kicker)
 # Pair: (1, pair card, (kicker high card, kicker med card, kicker low card))
 # High Card: (0, [high card, second high card, third high card, etc.])
-def detect_hand(hole_cards, given_board, suit_histogram, full_histogram):
-    # Pre-processing
-    # Add hole cards to suit_histogram data structure
+def detect_hand(hole_cards, given_board, suit_histogram, full_histogram,
+                                                                    max_suit):
     hole_card0, hole_card1 = hole_cards[0], hole_cards[1]
-    max_suit = max(suit_histogram)
 
     # Determine if flush possible. If yes, four of a kind and full house are
     # impossible, so return royal, straight, or regular flush.

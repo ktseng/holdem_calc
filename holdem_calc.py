@@ -43,10 +43,11 @@ def main():
     for board in generate_boards():
         # Find the best possible poker hand given the created board and the
         # hole cards and save them in the results data structures
-        suit_histogram, histogram = holdem_functions.preprocess_board(board)
+        (suit_histogram, histogram,
+                        max_suit) = holdem_functions.preprocess_board(board)
         for index, hole_card in enumerate(hole_cards):
             result_list[index] = holdem_functions.detect_hand(hole_card, board,
-                                                     suit_histogram, histogram)
+                                         suit_histogram, histogram, max_suit)
         # Find the winner of the hand and tabulate results
         winner_index = holdem_functions.compare_hands(result_list)
         winner_list[winner_index] += 1
