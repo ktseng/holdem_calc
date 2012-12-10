@@ -8,8 +8,8 @@ Usage
 
 	$ python holdem_calc.py Ad Kd Qc Qs
 	Winning Percentages:
-	(2d, 3d) :  0.46148
-	(4c, 4s) :  0.53427
+	(Ad, Kd) :  0.46148
+	(Qc, Qs) :  0.53427
 	Ties:  0.00425
 
 	Player1 Histogram:
