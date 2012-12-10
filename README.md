@@ -6,6 +6,7 @@ The Holdem Calculator library calculates the probability that a certain Texas Ho
 Usage
 -----
 Default use case:
+
 	$ python holdem_calc.py Ad Kd Qc Qs
 	Winning Percentages:
 	(Ad, Kd) :  0.46148
@@ -40,6 +41,7 @@ Default use case:
 	Time elapsed(seconds):  1.56669712067
 
 Multiplayer use case:
+
 	$ python holdem_calc.py As Ks Td Jd 4h 4c
 	Winning Percentages:
 	(As, Ks) :  0.38166
@@ -86,7 +88,8 @@ Multiplayer use case:
 
 	Time elapsed(seconds):  2.0515730381
 
-Exact Calculation:
+Exact calculation:
+
 	$ python holdem_calc.py As Ac 7d 8d -e
 	Winning Percentages:
 	(As, Ac) :  0.768322681019
@@ -120,7 +123,8 @@ Exact Calculation:
 
 	Time elapsed(seconds):  19.6590108871
 
-Board supplied
+Board supplied:
+
 	$ python holdem_calc.py As Ac 7d 8d -b 6d 9d 2h
 	Winning Percentages:
 	(As, Ac) :  0.437373737374
