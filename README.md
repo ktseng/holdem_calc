@@ -1,7 +1,7 @@
 Holdem Calculator
 =================
 
-The Holdem Calculator library calculates the probability that a certain Texas Hold'em hand will win by running a Monte Carlo simulation. It also shows you how likely each set of hole cards is to make a certain poker hand. Numbers are generally accurate to the nearest percent. Accuracy can be improved by increasing the number of simulations that are run, but this will result in a longer running time.
+The Holdem Calculator library calculates the probability that a certain Texas Hold'em hand will win by either running a Monte Carlo simulation or against an exhaustive set of all possible hands. It also shows you how likely each set of hole cards is to make a certain poker hand. Monte Carlo simulations are generally accurate to the nearest percent. Accuracy can be improved by increasing the number of simulations that are run, but this will result in a longer running time.
 
 Usage
 -----
@@ -39,4 +39,15 @@ Usage
 
 	Time elapsed(seconds):  1.56669712067
 
-This usage pattern also applies for parallel_holdem_calc.py. You can add in as many players as you want, as long as the number of hole cards you provide is an even number.
+Command Line Options
+--------------------
+
+	-h, --help            show this help message and exit
+	-b [card [card ...]], --board [card [card ...]]
+												Add board cards
+	-e, --exact           Find exact odds by enumerating every possible board
+	-n N                  Run N Monte Carlo simulations
+
+
+This usage pattern also applies for parallel_holdem_calc.py. You can add in as many players as you want, as long as the number of hole cards you provide is a non-zero even number. Additionally, you
+can provide a board for common cards that are provided to all opponents.
