@@ -167,5 +167,4 @@ Command Line Options
 	-n N                  Run N Monte Carlo simulations
 
 
-This usage pattern also applies for parallel_holdem_calc.py. You can add in as many players as you want, as long as the number of hole cards you provide is a non-zero even number. Additionally, you
-can provide a board for common cards that are provided to all opponents.
+These usage patterns also applies for parallel_holdem_calc.py. You can add in as many players as you want, as long as the number of hole cards you provide is a non-zero even number. Additionally, you can provide a board for common cards that are provided to all opponents.
