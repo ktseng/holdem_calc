@@ -43,8 +43,7 @@ Command Line Options
 --------------------
 
 	-h, --help            show this help message and exit
-	-b [card [card ...]], --board [card [card ...]]
-												Add board cards
+	-b [card [card ...]]	Add board cards
 	-e, --exact           Find exact odds by enumerating every possible board
 	-n N                  Run N Monte Carlo simulations
 
