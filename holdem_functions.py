@@ -1,5 +1,3 @@
-import sys
-
 # Constants
 suit_index_dict = {"s": 0, "c": 1, "h": 2, "d": 3}
 reverse_suit_index = ("s", "c", "h", "d")
@@ -29,35 +27,31 @@ class Card:
         return self.value == other.value and self.suit == other.suit
 
 
-# Returns tuple of hole_cards: e.g. ((As, Ks), (Ad, Kd), (Jh, Th))
-def parse_cards():
-    # Iterate over command line arguments, convert them into cards, and append
-    # them into the cards list
-    cards = []
-    for arg in sys.argv[1:]:
-        new_card = Card(arg)
-        cards.append(new_card)
-    # Create two-tuples out of hole cards
-    hole_cards = []
-    current_hole_cards = []
-    for hole_card in cards:
-        current_hole_cards.append(hole_card)
-        if len(current_hole_cards) == 2:
-            hole_cards.append((current_hole_cards[0], current_hole_cards[1]))
-            current_hole_cards = []
-    return tuple(hole_cards)
-
-
 # Returns deck of cards with all hole cards removed
-def generate_deck(hole_cards):
+def generate_deck(taken_cards):
     deck = []
     for suit in reverse_suit_index:
         for ch in val_string:
             deck.append(Card(ch + suit))
-    for hole_card in hole_cards:
-        for card in hole_card:
+    for taken_card in taken_cards:
+        for card in taken_card:
             deck.remove(card)
     return tuple(deck)
+
+
+# Generate num_iterations random boards
+def generate_random_boards(deck, num_iterations, board_length):
+    import random
+    import time
+    random.seed(time.time())
+    for iteration in xrange(num_iterations):
+        yield random.sample(deck, 5 - board_length)
+
+
+# Generate all possible boards
+def generate_exhaustive_boards(deck, num_iterations, board_length):
+    import itertools
+    return itertools.combinations(deck, 5 - board_length)
 
 
 # Returns a board of cards all with suit = flush_index
@@ -68,10 +62,10 @@ def generate_suit_board(flat_board, flush_index):
     return histogram
 
 
-# Modifies the provided histogram argument and returns its length
+# Returns a list of two tuples of the form: (value of card, frequency of card)
 def preprocess(histogram):
     return [(14 - index, frequency) for index, frequency in
-                                        enumerate(histogram) if frequency != 0]
+                                        enumerate(histogram) if frequency]
 
 
 # Takes an iterable sequence and returns two items in a tuple:
@@ -184,19 +178,15 @@ def get_high_cards(histogram_board):
 # Two Pair: (2, high pair card, low pair card, kicker)
 # Pair: (1, pair card, (kicker high card, kicker med card, kicker low card))
 # High Card: (0, [high card, second high card, third high card, etc.])
-def detect_hand(hole_cards, given_board, suit_histogram, full_histogram,
-                                                                    max_suit):
-    hole_card0, hole_card1 = hole_cards[0], hole_cards[1]
-
+def detect_hand(hole_cards, given_board, suit_histogram,
+                                            full_histogram, max_suit):
     # Determine if flush possible. If yes, four of a kind and full house are
     # impossible, so return royal, straight, or regular flush.
     if max_suit >= 3:
         flush_index = suit_histogram.index(max_suit)
-        if hole_card0.suit_index == flush_index:
-            max_suit += 1
-        if hole_card1.suit_index == flush_index:
-            max_suit += 1
-        # Find whether there is a royal/straight flush
+        for hole_card in hole_cards:
+            if hole_card.suit_index == flush_index:
+                max_suit += 1
         if max_suit >= 5:
             flat_board = list(given_board)
             flat_board.extend(hole_cards)
@@ -208,8 +198,8 @@ def detect_hand(hole_cards, given_board, suit_histogram, full_histogram,
 
     # Add hole cards to histogram data structure and process it
     full_histogram = full_histogram[:]
-    full_histogram[14 - hole_card0.value] += 1
-    full_histogram[14 - hole_card1.value] += 1
+    for hole_card in hole_cards:
+        full_histogram[14 - hole_card.value] += 1
     histogram_board = preprocess(full_histogram)
 
     # Find which card value shows up the most and second most times
