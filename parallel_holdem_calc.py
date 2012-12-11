@@ -49,7 +49,7 @@ def main():
                     exact, given_board, deck) = holdem_argparser.parse_args()
     num_players = len(hole_cards)
     # Create data structures to manage multiple processes:
-    # 1) winner_list: number of times each player wins the given round
+    # 1) winner_list: number of times each player wins a hand
     # 2) result_histograms: a list for each player that shows the number of
     #    times each type of poker hand (e.g. flush, straight) was gotten
     winner_list = multiprocessing.Array('i', num_processes * (num_players + 1))
