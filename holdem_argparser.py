@@ -6,7 +6,8 @@ import holdem_functions
 def parse_args():
     # Define possible command line arguments
     parser = argparse.ArgumentParser(
-        description="Find the odds that a Texas Hold'em hand will win.")
+        description="Find the odds that a Texas Hold'em hand will win. Note "
+        "that cards must be given in the following format: As, Jc, Td, 3h.")
     parser.add_argument("cards", type=str, nargs="*", metavar="hole card",
         help="Hole cards you want to find the odds for.")
     parser.add_argument("-b", "--board", nargs="*", type=str, metavar="card",
