@@ -6,7 +6,8 @@ import multiprocessing
 
 # Multiprocessing global variables
 num_players, num_processes = 0, multiprocessing.cpu_count()
-winner_list, result_histograms, hole_cards, given_board = None, None, None, None
+winner_list, result_histograms = None, None
+hole_cards, given_board = None, None
 
 
 # Separated function for each thread to execute while running
