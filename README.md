@@ -13,7 +13,7 @@ Command Line Options
 
 Usage
 -----
-I've listed a few examples showing how to use the Holdem Calculator. Note that you can mix and match command line options to suit your needs.
+I've listed a few examples showing how to use the Holdem Calculator. Note that you can mix and match command line options to suit your needs. See the bottom example in this section to see how to use the multiprocess Holdem Calculator for faster computations.
 
 Default use case:
 
