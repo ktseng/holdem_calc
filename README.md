@@ -168,7 +168,7 @@ Board supplied:
 
 	Time elapsed(seconds):  0.0137040615082
 
-Multiprocess Holdem Calculator. Takes the same command line options but utilizes multicore processors to increase the speed of computation.
+Multiprocess Holdem Calculator. Takes the same command line options but utilizes multicore processors to increase the speed of computation. Unfortunately, multiprocess holdem calculator currently does not work on Windows. Support will be added soon.
 
 	$ python parallel_holdem_calc.py As Ah Td Jd --exact
 	Winning Percentages:
