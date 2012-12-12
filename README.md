@@ -170,10 +170,10 @@ Board supplied:
 
 Multiprocess Holdem Calculator. Takes the same command line options, but utilizes multicore processors to increase the speed of computation.
 
-	$ python parallel_holdem_calc.py Ad As Jc Tc --exact
+	$ python parallel_holdem_calc.py As Ah Td Jd --exact
 	Winning Percentages:
-	(Ad, As) :  0.781151594577
-	(Jc, Tc) :  0.215486268793
+	(As, Ah) :  0.781151594577
+	(Td, Jd) :  0.215486268793
 	Ties:  0.00336213662994
 
 	Player1 Histogram:
@@ -201,4 +201,4 @@ Multiprocess Holdem Calculator. Takes the same command line options, but utilize
 	Royal Flush :  0.000578752371074
 
 
-	Time elapsed(seconds):  11.8790619373
+	Time elapsed(seconds):  11.5955700874
