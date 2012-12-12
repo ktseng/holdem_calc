@@ -4,15 +4,13 @@ import holdem_argparser
 import multiprocessing
 
 
-# Multiprocessing global variables
-num_players, num_processes = 0, multiprocessing.cpu_count()
-winner_list, result_histograms = None, None
-hole_cards, given_board = None, None
-
-
 # Separated function for each thread to execute while running
 def simulation(remaining_board):
-    global given_board, hole_cards
+    # Extract variables shared through inheritance
+    given_board, hole_cards = simulation.given_board, simulation.hole_cards
+    num_players = simulation.num_players
+    winner_list = simulation.winner_list
+    result_histograms = simulation.result_histograms
     # Generate a new board
     if given_board:
         board = given_board[:]
@@ -42,9 +40,17 @@ def simulation(remaining_board):
                                                       + result[0]] += 1
 
 
+# Initialize shared variables for simulation
+def simulation_init(given_board, hole_cards, winner_list,
+                                             result_histograms, num_players):
+    simulation.given_board = given_board
+    simulation.hole_cards = hole_cards
+    simulation.winner_list = winner_list
+    simulation.result_histograms = result_histograms
+    simulation.num_players = num_players
+
+
 def main():
-    global winner_list, result_histograms
-    global deck, num_players, hole_cards, given_board
     # Parse command line arguments into hole cards and create deck
     (hole_cards, num_iterations,
                     exact, given_board, deck) = holdem_argparser.parse_args()
@@ -53,6 +59,7 @@ def main():
     # 1) winner_list: number of times each player wins a hand
     # 2) result_histograms: a list for each player that shows the number of
     #    times each type of poker hand (e.g. flush, straight) was gotten
+    num_processes = multiprocessing.cpu_count()
     winner_list = multiprocessing.Array('i', num_processes * (num_players + 1))
     result_histograms = multiprocessing.Array('i',
                                               num_processes * num_players * 10)
@@ -65,7 +72,10 @@ def main():
     else:
         generate_boards = holdem_functions.generate_random_boards
     # Create threadpool and use it to perform hand detection over all boards
-    pool = multiprocessing.Pool(processes=num_processes)
+    pool = multiprocessing.Pool(processes=num_processes,
+                                initializer=simulation_init,
+                                initargs=(given_board, hole_cards, winner_list,
+                                          result_histograms, num_players))
     pool.map(simulation, generate_boards(deck, num_iterations, board_length))
     # Tallying and printing results
     combined_winner_list, combined_histograms = [0] * (num_players + 1), []
@@ -75,7 +85,7 @@ def main():
     for index, element in enumerate(winner_list):
         combined_winner_list[index % (num_players + 1)] += element
     for index, element in enumerate(result_histograms):
-        combined_histograms[(index / 10) % num_players][index % 10] += element
+        combined_histograms[(index // 10) % num_players][index % 10] += element
     # Print results
     holdem_functions.print_results(hole_cards, combined_winner_list,
                                                         combined_histograms)
