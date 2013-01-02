@@ -203,3 +203,7 @@ Windows users: due to the process forking mechanism in Windows, parallel_holdem_
 
 
 	Time elapsed(seconds):  11.5955700874
+
+## Copyright
+
+Copyright (c) 2013 Kevin Tseng. See [LICENSE](https://github.com/ktseng/holdem_calc/blob/master/LICENSE) for details.
