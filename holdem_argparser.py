@@ -47,8 +47,8 @@ def error_check(args):
     all_cards = list(args.cards)
     # Checking that the board length is either 3 or 4 (flop or flop + turn)
     if args.board:
-        if len(args.board) != 3 and len(args.board) != 4:
-            print "Board must have a length of 3 or 4."
+        if len(args.board) > 5 or len(args.board) < 3:
+            print "Board must have a length of 3, 4, or 5."
             exit()
         all_cards.extend(args.board)
     # Checking that the hole cards + board are formatted properly and unique
