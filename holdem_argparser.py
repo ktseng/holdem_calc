@@ -57,7 +57,7 @@ def parse_cards(cards, board):
         board = create_cards(board)
     return hole_cards, board
 
-# Error check the command line arguments and return the
+# Error check the command line arguments
 def error_check_arguments(args):
     # Check that the number of Monte Carlo simulations is a positive number
     if args.n <= 0:
@@ -67,7 +67,8 @@ def error_check_arguments(args):
     if args.input:
         file_name = args.input
         try:
-            open(file_name, 'r')
+            input_file = open(file_name, 'r')
+            input_file.close()
         except IOError:
             print "Error opening file " + file_name
             exit()
