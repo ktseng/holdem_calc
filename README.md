@@ -246,7 +246,7 @@ be separated using a "|" divider.
 
 	-----------------------------------
 
-  Time elapsed(seconds):  16.41842103
+	Time elapsed(seconds):  16.41842103
 
 Multiprocess Holdem Calculator. Takes the same command line options but utilizes multicore processors to increase the speed of computation.
 Windows users: due to the process forking mechanism in Windows, parallel_holdem_calc might be slower than expected.
