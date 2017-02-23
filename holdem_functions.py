@@ -9,7 +9,6 @@ suit_value_dict = {"T": 10, "J": 11, "Q": 12, "K": 13, "A": 14}
 for num in xrange(2, 10):
     suit_value_dict[str(num)] = num
 
-
 class Card:
     # Takes in strings of the format: "As", "Tc", "6d"
     def __init__(self, card_string):
@@ -26,46 +25,46 @@ class Card:
     def __eq__(self, other):
         return self.value == other.value and self.suit == other.suit
 
-
-# Returns deck of cards with all hole cards removed
-def generate_deck(taken_cards):
+# Returns deck of cards with all hole cards and board cards removed
+def generate_deck(hole_cards, board):
     deck = []
     for suit in reverse_suit_index:
-        for ch in val_string:
-            deck.append(Card(ch + suit))
+        for value in val_string:
+            deck.append(Card(value + suit))
+    taken_cards = []
+    for hole_card in hole_cards:
+        for card in hole_card:
+            taken_cards.append(card)
+    if board and len(board) > 0:
+        taken_cards.extend(board)
     for taken_card in taken_cards:
-        for card in taken_card:
-            deck.remove(card)
+        deck.remove(taken_card)
     return tuple(deck)
-
 
 # Generate num_iterations random boards
 def generate_random_boards(deck, num_iterations, board_length):
     import random
     import time
     random.seed(time.time())
-    for iteration in xrange(num_iterations):
+    for _ in xrange(num_iterations):
         yield random.sample(deck, 5 - board_length)
-
 
 # Generate all possible boards
 def generate_exhaustive_boards(deck, num_iterations, board_length):
     import itertools
     return itertools.combinations(deck, 5 - board_length)
 
-
 # Returns a board of cards all with suit = flush_index
 def generate_suit_board(flat_board, flush_index):
     histogram = [card.value for card in flat_board
-                                if card.suit_index == flush_index]
+                 if card.suit_index == flush_index]
     histogram.sort(reverse=True)
     return histogram
-
 
 # Returns a list of two tuples of the form: (value of card, frequency of card)
 def preprocess(histogram):
     return [(14 - index, frequency) for index, frequency in
-                                        enumerate(histogram) if frequency]
+            enumerate(histogram) if frequency]
 
 
 # Takes an iterable sequence and returns two items in a tuple:
@@ -79,7 +78,6 @@ def preprocess_board(flat_board):
         histogram[14 - card.value] += 1
         suit_histogram[card.suit_index] += 1
     return suit_histogram, histogram, max(suit_histogram)
-
 
 # Returns tuple: (Is there a straight flush?, high card)
 def detect_straight_flush(suit_board):
@@ -95,19 +93,17 @@ def detect_straight_flush(suit_board):
             # Fail fast if straight not possible
             if index >= fail_index:
                 if (index == fail_index and next_val == 5 and
-                                                    suit_board[0] == 14):
+                        suit_board[0] == 14):
                     return True, 5
                 break
             contiguous_length = 1
     return False,
-
 
 # Returns the highest kicker available
 def detect_highest_quad_kicker(histogram_board):
     for elem in histogram_board:
         if elem[1] < 4:
             return elem[0]
-
 
 # Returns tuple: (Is there a straight?, high card)
 def detect_straight(histogram_board):
@@ -123,12 +119,11 @@ def detect_straight(histogram_board):
             # Fail fast if straight not possible
             if index >= fail_index:
                 if (index == fail_index and next_val == 5 and
-                                        histogram_board[0][0] == 14):
+                        histogram_board[0][0] == 14):
                     return True, 5
                 break
             contiguous_length = 1
     return False,
-
 
 # Returns tuple of the two highest kickers that result from the three of a kind
 def detect_three_of_a_kind_kickers(histogram_board):
@@ -140,13 +135,11 @@ def detect_three_of_a_kind_kickers(histogram_board):
             else:
                 return kicker1, elem[0]
 
-
 # Returns the highest kicker available
 def detect_highest_kicker(histogram_board):
     for elem in histogram_board:
         if elem[1] == 1:
             return elem[0]
-
 
 # Returns tuple: (kicker1, kicker2, kicker3)
 def detect_pair_kickers(histogram_board):
@@ -160,12 +153,10 @@ def detect_pair_kickers(histogram_board):
             else:
                 return kicker1, kicker2, elem[0]
 
-
 # Returns a list of the five highest cards in the given board
 # Note: Requires a sorted board to be given as an argument
 def get_high_cards(histogram_board):
     return histogram_board[:5]
-
 
 # Return Values:
 # Royal Flush: (9,)
@@ -179,7 +170,7 @@ def get_high_cards(histogram_board):
 # Pair: (1, pair card, (kicker high card, kicker med card, kicker low card))
 # High Card: (0, [high card, second high card, third high card, etc.])
 def detect_hand(hole_cards, given_board, suit_histogram,
-                                            full_histogram, max_suit):
+                full_histogram, max_suit):
     # Determine if flush possible. If yes, four of a kind and full house are
     # impossible, so return royal, straight, or regular flush.
     if max_suit >= 3:
@@ -230,13 +221,12 @@ def detect_hand(hole_cards, given_board, suit_histogram,
         # Check to see if there is a two pair
         if second_max == 2:
             return 2, max_val, second_max_val, detect_highest_kicker(
-                                                            histogram_board)
+                histogram_board)
         # Return pair
         else:
             return 1, max_val, detect_pair_kickers(histogram_board)
     # Check for high cards
     return 0, get_high_cards(histogram_board)
-
 
 # Returns the index of the player with the winning hand
 def compare_hands(result_list):
@@ -246,7 +236,6 @@ def compare_hands(result_list):
     if best_hand in result_list[winning_player_index:]:
         return 0
     return winning_player_index
-
 
 # Print results
 def print_results(hole_cards, winner_list, result_histograms):

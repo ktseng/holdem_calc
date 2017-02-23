@@ -3,13 +3,21 @@ import holdem_functions
 import holdem_argparser
 
 
-# Driver function which parses the command line arguments into hole cards,
-# instantiates data structures to hold the intermediate results of the
-# simulations, performs the simulations, and prints the results
 def main():
-    # Parse command line arguments into hole cards and create deck
-    (hole_cards, num_iterations,
-                    exact, given_board, deck) = holdem_argparser.parse_args()
+    hole_cards, num, exact, board, file_name = holdem_argparser.parse_args()
+    if file_name:
+        input_file = open(file_name, 'r')
+        for line in input_file:
+            hole_cards, board = holdem_argparser.parse_file_args(line)
+            deck = holdem_functions.generate_deck(hole_cards, board)
+            run_simulation(hole_cards, num, exact, board, deck)
+            print "-----------------------------------"
+        input_file.close()
+    else:
+        deck = holdem_functions.generate_deck(hole_cards, board)
+        run_simulation(hole_cards, num, exact, board, deck)
+
+def run_simulation(hole_cards, num_iterations, exact, given_board, deck):
     num_players = len(hole_cards)
     # Create results data structures which tracks results of comparisons
     # 1) result_histograms: a list for each player that shows the number of
@@ -19,10 +27,10 @@ def main():
     #    hole cards for a given board
     result_list, winner_list = [None] * num_players, [0] * (num_players + 1)
     result_histograms = []
-    for player in xrange(num_players):
-        result_histograms.append([0] * 10)
+    for _ in xrange(num_players):
+        result_histograms.append([0] * len(holdem_functions.hand_rankings))
     # Choose whether we're running a Monte Carlo or exhaustive simulation
-    board_length = 0 if given_board == None else len(given_board)
+    board_length = 0 if given_board is None else len(given_board)
     # When a board is given, exact calculation is much faster than Monte Carlo
     # simulation, so default to exact if a board is given
     if exact or given_board is not None:
@@ -39,11 +47,12 @@ def main():
             board = remaining_board
         # Find the best possible poker hand given the created board and the
         # hole cards and save them in the results data structures
-        (suit_histogram,
-                histogram, max_suit) = holdem_functions.preprocess_board(board)
+        suit_histogram, histogram, max_suit = (
+            holdem_functions.preprocess_board(board))
         for index, hole_card in enumerate(hole_cards):
-            result_list[index] = holdem_functions.detect_hand(hole_card, board,
-                                         suit_histogram, histogram, max_suit)
+            result_list[index] = (
+                holdem_functions.detect_hand(hole_card, board, suit_histogram,
+                                             histogram, max_suit))
         # Find the winner of the hand and tabulate results
         winner_index = holdem_functions.compare_hands(result_list)
         winner_list[winner_index] += 1

@@ -6,10 +6,15 @@ The Holdem Calculator library calculates the probability that a certain Texas Ho
 Command Line Options
 --------------------
 
-	-h, --help            show this help message and exit
-	-b [card [card ...]]  Add board cards
-	-e, --exact           Find exact odds by enumerating every possible board
-	-n N                  Run N Monte Carlo simulations
+  -h, --help            show this help message and exit
+  -b [card [card ...]], --board [card [card ...]]
+                        Add board cards
+  -e, --exact           Find exact odds by enumerating every possible board
+  -n N                  Run N Monte Carlo simulations
+  -i INPUT, --input INPUT
+                        Read hole cards and boards from an input file.
+                        Commandline arguments for hole cards and board will be
+                        ignored
 
 Usage
 -----
@@ -167,6 +172,81 @@ Board supplied:
 
 
 	Time elapsed(seconds):  0.0137040615082
+
+Input file supplied:
+
+In order to calculate multiple hands in a single run, the user has the choice
+to allow Holdem Calculator to read from an input file. Each line of the
+input file should represent a single calculation. Hole cards and boards should
+be separated using a "|" divider.
+
+	$ cat input_file
+	Ad As Td Jd
+	Ad As Td Jd | 8d 9d 2c
+
+	$ python holdem_calc.py --input input_file --exact
+	Winning Percentages:
+	(Ad, As) :  0.791864061522
+	(Td, Jd) :  0.203947429896
+	Ties:  0.00418850858259
+
+	Player1 Histogram:
+	High Card :  0.0
+	Pair :  0.358631411245
+	Two Pair :  0.393626365412
+	Three of a Kind :  0.122320569245
+	Straight :  0.0115435109653
+	Flush :  0.0170863351368
+	Full House :  0.0875755706931
+	Four of a Kind :  0.00912221194367
+	Straight Flush :  6.71609714163e-05
+	Royal Flush :  2.68643885665e-05
+
+	Player2 Histogram:
+	High Card :  0.1535743653
+	Pair :  0.406777067624
+	Two Pair :  0.22637510629
+	Three of a Kind :  0.0449108335903
+	Straight :  0.0865465478093
+	Flush :  0.0543390659603
+	Full House :  0.0243624963791
+	Four of a Kind :  0.00141330044198
+	Straight Flush :  0.0017000485895
+	Royal Flush :  1.1680168942e-06
+
+	-----------------------------------
+	Winning Percentages:
+	(Ad, As) :  0.473737373737
+	(Td, Jd) :  0.526262626263
+	Ties:  0.0
+
+	Player1 Histogram:
+	High Card :  0.0
+	Pair :  0.49696969697
+	Two Pair :  0.377777777778
+	Three of a Kind :  0.0686868686869
+	Straight :  0.0
+	Flush :  0.0282828282828
+	Full House :  0.0272727272727
+	Four of a Kind :  0.0010101010101
+	Straight Flush :  0.0
+	Royal Flush :  0.0
+
+	Player2 Histogram:
+	High Card :  0.121212121212
+	Pair :  0.256565656566
+	Two Pair :  0.0787878787879
+	Three of a Kind :  0.0131313131313
+	Straight :  0.20303030303
+	Flush :  0.239393939394
+	Full House :  0.0
+	Four of a Kind :  0.0
+	Straight Flush :  0.0878787878788
+	Royal Flush :  0.0
+
+	-----------------------------------
+
+  Time elapsed(seconds):  16.41842103
 
 Multiprocess Holdem Calculator. Takes the same command line options but utilizes multicore processors to increase the speed of computation.
 Windows users: due to the process forking mechanism in Windows, parallel_holdem_calc might be slower than expected.
