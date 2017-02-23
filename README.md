@@ -6,15 +6,15 @@ The Holdem Calculator library calculates the probability that a certain Texas Ho
 Command Line Options
 --------------------
 
-  -h, --help            show this help message and exit
-  -b [card [card ...]], --board [card [card ...]]
-                        Add board cards
-  -e, --exact           Find exact odds by enumerating every possible board
-  -n N                  Run N Monte Carlo simulations
-  -i INPUT, --input INPUT
-                        Read hole cards and boards from an input file.
-                        Commandline arguments for hole cards and board will be
-                        ignored
+	-h, --help            show this help message and exit
+	-b [card [card ...]], --board [card [card ...]]
+	                      Add board cards
+	-e, --exact           Find exact odds by enumerating every possible board
+	-n N                  Run N Monte Carlo simulations
+	-i INPUT, --input INPUT
+	                      Read hole cards and boards from an input file.
+	                      Commandline arguments for hole cards and board will be
+	                      ignored
 
 Usage
 -----
