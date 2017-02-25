@@ -8,6 +8,8 @@ def main():
     if file_name:
         input_file = open(file_name, 'r')
         for line in input_file:
+            if line is not None and len(line.strip()) == 0:
+                continue
             hole_cards, board = holdem_argparser.parse_file_args(line)
             deck = holdem_functions.generate_deck(hole_cards, board)
             run_simulation(hole_cards, num, exact, board, deck)
