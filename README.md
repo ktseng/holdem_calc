@@ -248,7 +248,43 @@ be separated using a "|" divider.
 
 	Time elapsed(seconds):  16.41842103
 
-Multiprocess Holdem Calculator. Takes the same command line options but utilizes multicore processors to increase the speed of computation.
+Unknown Hole Cards: Compute how likely a hand is to win against a random pair of hole cards. You can only specify one set of hole cards as unknown.
+Note: Performing calculations with unknown hole cards takes an excessively long time if community cards are not specified.
+
+	$ python holdem_calc.py As Ks ? ? -b Ac 2h 6c
+	Winning Percentages:
+	(As, Ks) :  0.858660611667
+	(?, ?) :  0.135034900345
+	Ties:  0.00630448798811
+
+	Player1 Histogram:
+	High Card :  0.0
+	Pair :  0.532839962997
+	Two Pair :  0.374653098982
+	Three of a Kind :  0.0666049953747
+	Straight :  0.0
+	Flush :  0.0
+	Full House :  0.0249768732655
+	Four of a Kind :  0.000925069380204
+	Straight Flush :  0.0
+	Royal Flush :  0.0
+
+	Player2 Histogram:
+	High Card :  0.241033835113
+	Pair :  0.470249208085
+	Two Pair :  0.185989403751
+	Three of a Kind :  0.0336052476663
+	Straight :  0.0185462394528
+	Flush :  0.0378829927396
+	Full House :  0.0121043926779
+	Four of a Kind :  0.000543828665938
+	Straight Flush :  3.9245367645e-05
+	Royal Flush :  5.60648109214e-06
+
+
+	Time elapsed(seconds):  10.9187510014
+
+Multiprocess Holdem Calculator: Takes the same command line options but utilizes multicore processors to increase the speed of computation.
 Windows users: due to the process forking mechanism in Windows, parallel_holdem_calc might be slower than expected.
 
 	$ python parallel_holdem_calc.py As Ah Td Jd --exact

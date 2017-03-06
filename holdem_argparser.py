@@ -54,7 +54,7 @@ def parse_file_args(line):
 def parse_cards(cards, board):
     hole_cards = create_hole_cards(cards)
     if board:
-        board = create_cards(board)
+        board = parse_board(board)
     return hole_cards, board
 
 # Error check the command line arguments
@@ -82,34 +82,48 @@ def error_check_arguments(args):
 def error_check_cards(all_cards):
     card_re = re.compile('[AKQJT98765432][scdh]')
     for card in all_cards:
-        if not card_re.match(card):
+        if card != "?" and not card_re.match(card):
             print "Invalid card given."
             exit()
         else:
-            if all_cards.count(card) != 1:
+            if all_cards.count(card) != 1 and card != "?":
                 print "The cards given must be unique."
                 exit()
 
 # Returns tuple of two-tuple hole_cards: e.g. ((As, Ks), (Ad, Kd), (Jh, Th))
-def create_hole_cards(hole_cards):
+def create_hole_cards(raw_hole_cards):
     # Checking that there are an even number of hole cards
-    if hole_cards is None or len(hole_cards) < 2 or len(hole_cards) % 2:
+    if (raw_hole_cards is None or len(raw_hole_cards) < 2 or
+            len(raw_hole_cards) % 2):
         print "You must provide a non-zero even number of hole cards"
         exit()
-    cards = create_cards(hole_cards)
     # Create two-tuples out of hole cards
     hole_cards, current_hole_cards = [], []
-    for hole_card in cards:
-        current_hole_cards.append(hole_card)
+    for hole_card in raw_hole_cards:
+        if hole_card != "?":
+            current_card = holdem_functions.Card(hole_card)
+            current_hole_cards.append(current_card)
+        else:
+            current_hole_cards.append(None)
         if len(current_hole_cards) == 2:
+            if None in current_hole_cards:
+                if (current_hole_cards[0] is not None or
+                        current_hole_cards[1] is not None):
+                    print "Unknown hole cards must come in pairs"
+                    exit()
             hole_cards.append((current_hole_cards[0], current_hole_cards[1]))
             current_hole_cards = []
+    if hole_cards.count((None, None)) > 1:
+        print "Can only have one set of unknown hole cards"
     return tuple(hole_cards)
 
 # Returns list of board cards: e.g. [As Ks Ad Kd]
 def parse_board(board):
     if len(board) > 5 or len(board) < 3:
         print "Board must have a length of 3, 4, or 5."
+        exit()
+    if "?" in board:
+        print "Board cannot have unknown cards"
         exit()
     return create_cards(board)
 

@@ -23,6 +23,10 @@ class Card:
         return val_string[14 - self.value] + self.suit
 
     def __eq__(self, other):
+        if self is None:
+            return other is None
+        elif other is None:
+            return False
         return self.value == other.value and self.suit == other.suit
 
 # Returns deck of cards with all hole cards and board cards removed
@@ -34,12 +38,18 @@ def generate_deck(hole_cards, board):
     taken_cards = []
     for hole_card in hole_cards:
         for card in hole_card:
-            taken_cards.append(card)
+            if card is not None:
+                taken_cards.append(card)
     if board and len(board) > 0:
         taken_cards.extend(board)
     for taken_card in taken_cards:
         deck.remove(taken_card)
     return tuple(deck)
+
+# Generate all possible hole card combinations
+def generate_hole_cards(deck):
+    import itertools
+    return itertools.combinations(deck, 2)
 
 # Generate num_iterations random boards
 def generate_random_boards(deck, num_iterations, board_length):
@@ -242,10 +252,40 @@ def print_results(hole_cards, winner_list, result_histograms):
     float_iterations = float(sum(winner_list))
     print "Winning Percentages:"
     for index, hole_card in enumerate(hole_cards):
-        print hole_card, ": ", float(winner_list[index + 1]) / float_iterations
+        winning_percentage = float(winner_list[index + 1]) / float_iterations
+        if hole_card == (None, None):
+            print "(?, ?) : ", winning_percentage
+        else:
+            print hole_card, ": ", winning_percentage
     print "Ties: ", float(winner_list[0]) / float_iterations, "\n"
     for player_index, histogram in enumerate(result_histograms):
         print "Player" + str(player_index + 1) + " Histogram: "
         for index, elem in enumerate(histogram):
             print hand_rankings[index], ": ", float(elem) / float_iterations
         print
+
+# Populate provided data structures with results from simulation
+def find_winner(generate_boards, deck, hole_cards, num, board_length,
+                given_board, winner_list, result_histograms):
+    # Run simulations
+    result_list = [None] * len(hole_cards)
+    for remaining_board in generate_boards(deck, num, board_length):
+        # Generate a new board
+        if given_board:
+            board = given_board[:]
+            board.extend(remaining_board)
+        else:
+            board = remaining_board
+        # Find the best possible poker hand given the created board and the
+        # hole cards and save them in the results data structures
+        suit_histogram, histogram, max_suit = (
+            preprocess_board(board))
+        for index, hole_card in enumerate(hole_cards):
+            result_list[index] = detect_hand(hole_card, board, suit_histogram,
+                                             histogram, max_suit)
+        # Find the winner of the hand and tabulate results
+        winner_index = compare_hands(result_list)
+        winner_list[winner_index] += 1
+        # Increment what hand each player made
+        for index, result in enumerate(result_list):
+            result_histograms[index][result[0]] += 1
