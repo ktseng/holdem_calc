@@ -264,6 +264,15 @@ def print_results(hole_cards, winner_list, result_histograms):
             print hand_rankings[index], ": ", float(elem) / float_iterations
         print
 
+# Returns the winning percentages
+def find_winning_percentage(winner_list):
+    float_iterations = float(sum(winner_list))
+    percentages = []
+    for num_wins in winner_list:
+        winning_percentage = float(num_wins) / float_iterations
+        percentages.append(winning_percentage)
+    return percentages
+
 # Populate provided data structures with results from simulation
 def find_winner(generate_boards, deck, hole_cards, num, board_length,
                 given_board, winner_list, result_histograms):

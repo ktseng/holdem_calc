@@ -5,6 +5,14 @@ import holdem_argparser
 
 def main():
     hole_cards, num, exact, board, file_name = holdem_argparser.parse_args()
+    run(hole_cards, num, exact, board, file_name, True)
+
+def calculate(board, exact, num, input_file, hole_cards, verbose):
+    args = holdem_argparser.LibArgs(board, exact, num, input_file, hole_cards)
+    hole_cards, n, e, board, filename = holdem_argparser.parse_lib_args(args)
+    return run(hole_cards, n, e, board, filename, verbose)
+
+def run(hole_cards, num, exact, board, file_name, verbose):
     if file_name:
         input_file = open(file_name, 'r')
         for line in input_file:
@@ -12,14 +20,14 @@ def main():
                 continue
             hole_cards, board = holdem_argparser.parse_file_args(line)
             deck = holdem_functions.generate_deck(hole_cards, board)
-            run_simulation(hole_cards, num, exact, board, deck)
+            run_simulation(hole_cards, num, exact, board, deck, verbose)
             print "-----------------------------------"
         input_file.close()
     else:
         deck = holdem_functions.generate_deck(hole_cards, board)
-        run_simulation(hole_cards, num, exact, board, deck)
+        return run_simulation(hole_cards, num, exact, board, deck, verbose)
 
-def run_simulation(hole_cards, num, exact, given_board, deck):
+def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
     num_players = len(hole_cards)
     # Create results data structures which track results of comparisons
     # 1) result_histograms: a list for each player that shows the number of
@@ -54,7 +62,10 @@ def run_simulation(hole_cards, num, exact, given_board, deck):
         holdem_functions.find_winner(generate_boards, deck, hole_cards, num,
                                      board_length, given_board, winner_list,
                                      result_histograms)
-    holdem_functions.print_results(hole_cards, winner_list, result_histograms)
+    if verbose:
+        holdem_functions.print_results(hole_cards, winner_list,
+                                       result_histograms)
+    return holdem_functions.find_winning_percentage(winner_list)
 
 if __name__ == '__main__':
     start = time.time()

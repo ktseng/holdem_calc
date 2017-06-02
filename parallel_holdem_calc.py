@@ -6,6 +6,14 @@ import holdem_functions
 
 def main():
     hole_cards, num, exact, board, file_name = holdem_argparser.parse_args()
+    run(hole_cards, num, exact, board, file_name, True)
+
+def calculate(board, exact, num, input_file, hole_cards, verbose):
+    args = holdem_argparser.LibArgs(board, exact, num, input_file, hole_cards)
+    hole_cards, n, e, board, filename = holdem_argparser.parse_lib_args(args)
+    return run(hole_cards, n, e, board, filename, verbose)
+
+def run(hole_cards, num, exact, board, file_name, verbose):
     if file_name:
         input_file = open(file_name, 'r')
         for line in input_file:
@@ -13,14 +21,14 @@ def main():
                 continue
             hole_cards, board = holdem_argparser.parse_file_args(line)
             deck = holdem_functions.generate_deck(hole_cards, board)
-            run_simulation(hole_cards, num, exact, board, deck)
+            run_simulation(hole_cards, num, exact, board, deck, verbose)
             print "-----------------------------------"
         input_file.close()
     else:
         deck = holdem_functions.generate_deck(hole_cards, board)
-        run_simulation(hole_cards, num, exact, board, deck)
+        return run_simulation(hole_cards, num, exact, board, deck, verbose)
 
-def run_simulation(hole_cards, num, exact, given_board, deck):
+def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
     num_players = len(hole_cards)
     # Choose whether we're running a Monte Carlo or exhaustive simulation
     board_length = 0 if given_board is None else len(given_board)
@@ -62,8 +70,10 @@ def run_simulation(hole_cards, num, exact, given_board, deck):
     for index, element in enumerate(result_histograms):
         combined_histograms[(index / num_poker_hands) % num_players][
             (index % num_poker_hands)] += element
-    holdem_functions.print_results(hole_cards, combined_winner_list,
-                                   combined_histograms)
+    if verbose:
+        holdem_functions.print_results(hole_cards, combined_winner_list,
+                                       combined_histograms)
+    return holdem_functions.find_winning_percentage(combined_winner_list)
 
 def unknown_simulation_init(hole_cards_list, unknown_index, deck_list,
                             generate_boards, num, board_length, given_board,

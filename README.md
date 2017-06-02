@@ -20,7 +20,7 @@ Usage
 -----
 I've listed a few examples showing how to use the Holdem Calculator. Note that you can mix and match command line options to suit your needs. See the bottom example in this section to see how to use the multiprocess Holdem Calculator for faster computations.
 
-Default use case:
+### Default use case:
 
 	$ python holdem_calc.py Ad Kd Qc Qs
 	Winning Percentages:
@@ -55,7 +55,7 @@ Default use case:
 
 	Time elapsed(seconds):  1.56669712067
 
-Multiplayer use case:
+### Multiplayer use case:
 
 	$ python holdem_calc.py As Ks Td Jd 4h 4c
 	Winning Percentages:
@@ -103,7 +103,7 @@ Multiplayer use case:
 
 	Time elapsed(seconds):  2.0515730381
 
-Exact calculation:
+### Exact calculation:
 
 	$ python holdem_calc.py As Ac 7d 8d --exact
 	Winning Percentages:
@@ -138,7 +138,7 @@ Exact calculation:
 
 	Time elapsed(seconds):  19.6590108871
 
-Board supplied:
+### Board supplied:
 
 	$ python holdem_calc.py As Ac 7d 8d -b 6d 9d 2h
 	Winning Percentages:
@@ -173,12 +173,9 @@ Board supplied:
 
 	Time elapsed(seconds):  0.0137040615082
 
-Input file supplied:
+### Input file supplied:
 
-In order to calculate multiple hands in a single run, the user has the choice
-to allow Holdem Calculator to read from an input file. Each line of the
-input file should represent a single calculation. Hole cards and boards should
-be separated using a "|" divider.
+In order to calculate multiple hands in a single run, the user has the choice to allow Holdem Calculator to read from an input file. Each line of the input file should represent a single calculation. Hole cards and boards should be separated using a "|" divider.
 
 	$ cat input_file
 	Ad As Td Jd
@@ -248,8 +245,10 @@ be separated using a "|" divider.
 
 	Time elapsed(seconds):  16.41842103
 
-Unknown Hole Cards: Compute how likely a hand is to win against a random pair of hole cards. You can only specify one set of hole cards as unknown.
-Note: Performing calculations with unknown hole cards takes an excessively long time if community cards are not specified.
+### Unknown Hole Cards:
+
+Compute how likely a hand is to win against a random pair of hole cards. You can only specify one set of hole cards as unknown.
+**Note:** Performing calculations with unknown hole cards takes an excessively long time if community cards are not specified.
 
 	$ python holdem_calc.py As Ks ? ? -b Ac 2h 6c
 	Winning Percentages:
@@ -284,8 +283,9 @@ Note: Performing calculations with unknown hole cards takes an excessively long 
 
 	Time elapsed(seconds):  10.9187510014
 
-Multiprocess Holdem Calculator: Takes the same command line options but utilizes multicore processors to increase the speed of computation.
-Windows users: due to the process forking mechanism in Windows, parallel_holdem_calc might be slower than expected.
+### Multiprocess Holdem Calculator:
+Takes the same command line options but utilizes multicore processors to increase the speed of computation.
+**Windows users:** due to the processorking mechanism in Windows, parallel_holdem_calc might be slower than expected.**
 
 	$ python parallel_holdem_calc.py As Ah Td Jd --exact
 	Winning Percentages:
@@ -319,6 +319,30 @@ Windows users: due to the process forking mechanism in Windows, parallel_holdem_
 
 
 	Time elapsed(seconds):  11.5955700874
+
+### Library Calls:
+If you want to use Holdem Calculator as a library, you can import holdem_calc or parallel_holdem_calc and call calculate(). The order of arguments to calculate() are as follows:
+
+1. Board: These are the community cards supplied to the calculation. This is in the form of a list of strings, with each string representing a card. If you do not want to specify community cards, you can set board to be None. Example: ["As", "Ks", "Jd"]
+2. Exact: This is a boolean which is True if you want an exact calculation, and False if you want a Monte Carlo simulation.
+3. Number of Simulations: This is the number of iterations run in the Monte Carlo simulation. Note that this parameter is ignored if Exact is set to True. **This number must be positive, even if Exact is set to true.**
+4. Input File: The name of the input file you want Holdem Calculator to read from. Mark as None, if you do not wish to read from a file. **If Input File is set, library calls will not return anything.**
+5. Hole Cards: These are the hole cards for each of the players. This is in the form of a list of strings, with each string representing a card. Example: ["As", "Ks", "Jd", "Td"]
+6. Verbose: This is a boolean which is True if you want Holdem Calculator to print the results.
+
+Calls to calculate() return a list of floats. The first element in the list corresponds to the probability that a tie takes place. Each element after that corresponds to the probability one of the hole cards the user provides wins the hand. These probabilities occur in the order in which you list them.
+
+
+	$ cat example.py
+	import holdem_calc
+	import parallel_holdem_calc
+
+	print holdem_calc.calculate(["As", "Ks", "Jd"], True, 1, None, ["8s", "7s", "Qc", "Th"], False)
+	print parallel_holdem_calc.calculate(None, True, 1, None, ["8s", "7s", "Ad", "Ac"], False)
+
+	$ python example.py
+	[0.00404040404040404, 0.36363636363636365, 0.6323232323232323]
+	[0.0029375624889038396, 0.2287397564918379, 0.7683226810192583]
 
 ## Copyright
 

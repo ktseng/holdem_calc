@@ -3,6 +3,26 @@ import re
 import holdem_functions
 
 
+# Wrapper class which holds the arguments for library calls
+# Mocks actual argparse object
+class LibArgs:
+    def __init__(self, board, exact, num, input_file, hole_cards):
+        self.board = board
+        self.cards = hole_cards
+        self.n = num
+        self.input = input_file
+        self.exact = exact
+
+# Parses arguments passed to holdem_calc as a library call
+def parse_lib_args(args):
+    error_check_arguments(args)
+    # Parse hole cards and board
+    hole_cards, board = None, None
+    if not args.input:
+        hole_cards, board = parse_cards(args.cards, args.board)
+    return hole_cards, args.n, args.exact, board, args.input
+
+# Parses command line arguments to holdem_calc
 def parse_args():
     # Define possible command line arguments
     parser = argparse.ArgumentParser(
@@ -56,6 +76,27 @@ def parse_cards(cards, board):
     if board:
         board = parse_board(board)
     return hole_cards, board
+
+# Error check the command line arguments
+def error_check_arguments(args):
+    # Check that the number of Monte Carlo simulations is a positive number
+    if args.n <= 0:
+        print "Number of Monte Carlo simulations must be positive."
+        exit()
+    # Check that we can open the specified input file
+    if args.input:
+        file_name = args.input
+        try:
+            input_file = open(file_name, 'r')
+            input_file.close()
+        except IOError:
+            print "Error opening file " + file_name
+            exit()
+    # Check to make sure all cards are of a valid format
+    all_cards = list(args.cards)
+    if args.board:
+        all_cards.extend(args.board)
+    error_check_cards(all_cards)
 
 # Error check the command line arguments
 def error_check_arguments(args):
