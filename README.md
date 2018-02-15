@@ -285,7 +285,7 @@ Compute how likely a hand is to win against a random pair of hole cards. You can
 
 ### Multiprocess Holdem Calculator:
 Takes the same command line options but utilizes multicore processors to increase the speed of computation.
-**Windows users:** due to the processorking mechanism in Windows, parallel_holdem_calc might be slower than expected.**
+**Windows users:** Due to the process forking mechanism in Windows, parallel_holdem_calc might be slower than expected.
 
 	$ python parallel_holdem_calc.py As Ah Td Jd --exact
 	Winning Percentages:
