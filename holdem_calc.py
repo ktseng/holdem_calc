@@ -21,7 +21,7 @@ def run(hole_cards, num, exact, board, file_name, verbose):
             hole_cards, board = holdem_argparser.parse_file_args(line)
             deck = holdem_functions.generate_deck(hole_cards, board)
             run_simulation(hole_cards, num, exact, board, deck, verbose)
-            print "-----------------------------------"
+            print("-----------------------------------")
         input_file.close()
     else:
         deck = holdem_functions.generate_deck(hole_cards, board)
@@ -36,7 +36,7 @@ def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
     # 3) result_list: list of the best possible poker hand for each pair of
     #    hole cards for a given board
     result_histograms, winner_list = [], [0] * (num_players + 1)
-    for _ in xrange(num_players):
+    for _ in range(num_players):
         result_histograms.append([0] * len(holdem_functions.hand_rankings))
     # Choose whether we're running a Monte Carlo or exhaustive simulation
     board_length = 0 if given_board is None else len(given_board)
@@ -70,4 +70,4 @@ def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
 if __name__ == '__main__':
     start = time.time()
     main()
-    print "\nTime elapsed(seconds): ", time.time() - start
+    print("\nTime elapsed(seconds): ", time.time() - start)

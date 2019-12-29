@@ -53,13 +53,13 @@ def parse_args():
 # Parses a line taken from the input file and returns the hole cards and board
 def parse_file_args(line):
     if line is None or len(line) == 0:
-        print line
-        print "Invalid format"
+        print(line)
+        print("Invalid format")
         exit()
     values = line.split("|")
     if len(values) > 2 or len(values) < 1:
-        print line
-        print "Invalid format"
+        print(line)
+        print("Invalid format")
         exit()
     hole_cards = values[0].split()
     all_cards = list(hole_cards)
@@ -81,7 +81,7 @@ def parse_cards(cards, board):
 def error_check_arguments(args):
     # Check that the number of Monte Carlo simulations is a positive number
     if args.n <= 0:
-        print "Number of Monte Carlo simulations must be positive."
+        print("Number of Monte Carlo simulations must be positive.")
         exit()
     # Check that we can open the specified input file
     if args.input:
@@ -90,7 +90,7 @@ def error_check_arguments(args):
             input_file = open(file_name, 'r')
             input_file.close()
         except IOError:
-            print "Error opening file " + file_name
+            print("Error opening file " + file_name)
             exit()
     # Check to make sure all cards are of a valid format
     all_cards = list(args.cards)
@@ -102,7 +102,7 @@ def error_check_arguments(args):
 def error_check_arguments(args):
     # Check that the number of Monte Carlo simulations is a positive number
     if args.n <= 0:
-        print "Number of Monte Carlo simulations must be positive."
+        print("Number of Monte Carlo simulations must be positive.")
         exit()
     # Check that we can open the specified input file
     if args.input:
@@ -111,7 +111,7 @@ def error_check_arguments(args):
             input_file = open(file_name, 'r')
             input_file.close()
         except IOError:
-            print "Error opening file " + file_name
+            print("Error opening file " + file_name)
             exit()
     # Check to make sure all cards are of a valid format
     all_cards = list(args.cards)
@@ -124,11 +124,11 @@ def error_check_cards(all_cards):
     card_re = re.compile('[AKQJT98765432][scdh]')
     for card in all_cards:
         if card != "?" and not card_re.match(card):
-            print "Invalid card given."
+            print("Invalid card given.")
             exit()
         else:
             if all_cards.count(card) != 1 and card != "?":
-                print "The cards given must be unique."
+                print("The cards given must be unique.")
                 exit()
 
 # Returns tuple of two-tuple hole_cards: e.g. ((As, Ks), (Ad, Kd), (Jh, Th))
@@ -136,7 +136,7 @@ def create_hole_cards(raw_hole_cards):
     # Checking that there are an even number of hole cards
     if (raw_hole_cards is None or len(raw_hole_cards) < 2 or
             len(raw_hole_cards) % 2):
-        print "You must provide a non-zero even number of hole cards"
+        print("You must provide a non-zero even number of hole cards")
         exit()
     # Create two-tuples out of hole cards
     hole_cards, current_hole_cards = [], []
@@ -150,21 +150,21 @@ def create_hole_cards(raw_hole_cards):
             if None in current_hole_cards:
                 if (current_hole_cards[0] is not None or
                         current_hole_cards[1] is not None):
-                    print "Unknown hole cards must come in pairs"
+                    print("Unknown hole cards must come in pairs")
                     exit()
             hole_cards.append((current_hole_cards[0], current_hole_cards[1]))
             current_hole_cards = []
     if hole_cards.count((None, None)) > 1:
-        print "Can only have one set of unknown hole cards"
+        print("Can only have one set of unknown hole cards")
     return tuple(hole_cards)
 
 # Returns list of board cards: e.g. [As Ks Ad Kd]
 def parse_board(board):
     if len(board) > 5 or len(board) < 3:
-        print "Board must have a length of 3, 4, or 5."
+        print("Board must have a length of 3, 4, or 5.")
         exit()
     if "?" in board:
-        print "Board cannot have unknown cards"
+        print("Board cannot have unknown cards")
         exit()
     return create_cards(board)
 
