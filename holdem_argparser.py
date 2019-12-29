@@ -104,28 +104,6 @@ def error_check_arguments(args):
     error_check_cards(all_cards)
 
 
-# Error check the command line arguments
-def error_check_arguments(args):
-    # Check that the number of Monte Carlo simulations is a positive number
-    if args.n <= 0:
-        print("Number of Monte Carlo simulations must be positive.")
-        exit()
-    # Check that we can open the specified input file
-    if args.input:
-        file_name = args.input
-        try:
-            input_file = open(file_name, 'r')
-            input_file.close()
-        except IOError:
-            print("Error opening file " + file_name)
-            exit()
-    # Check to make sure all cards are of a valid format
-    all_cards = list(args.cards)
-    if args.board:
-        all_cards.extend(args.board)
-    error_check_cards(all_cards)
-
-
 # Checking that the hole cards + board are formatted properly and unique
 def error_check_cards(all_cards):
     card_re = re.compile('[AKQJT98765432][scdh]')
