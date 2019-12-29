@@ -1,6 +1,6 @@
 import argparse
 import re
-import holdem_functions
+from holdem_calc import holdem_functions
 
 
 # Wrapper class which holds the arguments for library calls

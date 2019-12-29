@@ -1,6 +1,5 @@
 import time
-import holdem_functions
-import holdem_argparser
+from holdem_calc import holdem_functions, holdem_argparser
 
 
 def main():
