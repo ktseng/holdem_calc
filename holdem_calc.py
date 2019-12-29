@@ -7,10 +7,12 @@ def main():
     hole_cards, num, exact, board, file_name = holdem_argparser.parse_args()
     run(hole_cards, num, exact, board, file_name, True)
 
+
 def calculate(board, exact, num, input_file, hole_cards, verbose):
     args = holdem_argparser.LibArgs(board, exact, num, input_file, hole_cards)
     hole_cards, n, e, board, filename = holdem_argparser.parse_lib_args(args)
     return run(hole_cards, n, e, board, filename, verbose)
+
 
 def run(hole_cards, num, exact, board, file_name, verbose):
     if file_name:
@@ -26,6 +28,7 @@ def run(hole_cards, num, exact, board, file_name, verbose):
     else:
         deck = holdem_functions.generate_deck(hole_cards, board)
         return run_simulation(hole_cards, num, exact, board, deck, verbose)
+
 
 def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
     num_players = len(hole_cards)
@@ -66,6 +69,7 @@ def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
         holdem_functions.print_results(hole_cards, winner_list,
                                        result_histograms)
     return holdem_functions.find_winning_percentage(winner_list)
+
 
 if __name__ == '__main__':
     start = time.time()
