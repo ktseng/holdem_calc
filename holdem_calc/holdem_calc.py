@@ -1,16 +1,17 @@
 import time
-import holdem_functions
-import holdem_argparser
+from holdem_calc import holdem_functions, holdem_argparser
 
 
 def main():
     hole_cards, num, exact, board, file_name = holdem_argparser.parse_args()
     run(hole_cards, num, exact, board, file_name, True)
 
+
 def calculate(board, exact, num, input_file, hole_cards, verbose):
     args = holdem_argparser.LibArgs(board, exact, num, input_file, hole_cards)
     hole_cards, n, e, board, filename = holdem_argparser.parse_lib_args(args)
     return run(hole_cards, n, e, board, filename, verbose)
+
 
 def run(hole_cards, num, exact, board, file_name, verbose):
     if file_name:
@@ -21,11 +22,12 @@ def run(hole_cards, num, exact, board, file_name, verbose):
             hole_cards, board = holdem_argparser.parse_file_args(line)
             deck = holdem_functions.generate_deck(hole_cards, board)
             run_simulation(hole_cards, num, exact, board, deck, verbose)
-            print "-----------------------------------"
+            print("-----------------------------------")
         input_file.close()
     else:
         deck = holdem_functions.generate_deck(hole_cards, board)
         return run_simulation(hole_cards, num, exact, board, deck, verbose)
+
 
 def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
     num_players = len(hole_cards)
@@ -36,7 +38,7 @@ def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
     # 3) result_list: list of the best possible poker hand for each pair of
     #    hole cards for a given board
     result_histograms, winner_list = [], [0] * (num_players + 1)
-    for _ in xrange(num_players):
+    for _ in range(num_players):
         result_histograms.append([0] * len(holdem_functions.hand_rankings))
     # Choose whether we're running a Monte Carlo or exhaustive simulation
     board_length = 0 if given_board is None else len(given_board)
@@ -67,7 +69,8 @@ def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
                                        result_histograms)
     return holdem_functions.find_winning_percentage(winner_list)
 
+
 if __name__ == '__main__':
     start = time.time()
     main()
-    print "\nTime elapsed(seconds): ", time.time() - start
+    print("\nTime elapsed(seconds): ", time.time() - start)

@@ -1,17 +1,18 @@
 import multiprocessing
 import time
-import holdem_argparser
-import holdem_functions
+from holdem_calc import holdem_functions, holdem_argparser
 
 
 def main():
     hole_cards, num, exact, board, file_name = holdem_argparser.parse_args()
     run(hole_cards, num, exact, board, file_name, True)
 
+
 def calculate(board, exact, num, input_file, hole_cards, verbose):
     args = holdem_argparser.LibArgs(board, exact, num, input_file, hole_cards)
     hole_cards, n, e, board, filename = holdem_argparser.parse_lib_args(args)
     return run(hole_cards, n, e, board, filename, verbose)
+
 
 def run(hole_cards, num, exact, board, file_name, verbose):
     if file_name:
@@ -22,11 +23,12 @@ def run(hole_cards, num, exact, board, file_name, verbose):
             hole_cards, board = holdem_argparser.parse_file_args(line)
             deck = holdem_functions.generate_deck(hole_cards, board)
             run_simulation(hole_cards, num, exact, board, deck, verbose)
-            print "-----------------------------------"
+            print("-----------------------------------")
         input_file.close()
     else:
         deck = holdem_functions.generate_deck(hole_cards, board)
         return run_simulation(hole_cards, num, exact, board, deck, verbose)
+
 
 def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
     num_players = len(hole_cards)
@@ -63,7 +65,7 @@ def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
                     given_board, winner_list, result_histograms)
     # Go through each parallel data structure and aggregate results
     combined_winner_list, combined_histograms = [0] * (num_players + 1), []
-    for _ in xrange(num_players):
+    for _ in range(num_players):
         combined_histograms.append([0] * len(holdem_functions.hand_rankings))
     for index, element in enumerate(winner_list):
         combined_winner_list[index % (num_players + 1)] += element
@@ -74,6 +76,7 @@ def run_simulation(hole_cards, num, exact, given_board, deck, verbose):
         holdem_functions.print_results(hole_cards, combined_winner_list,
                                        combined_histograms)
     return holdem_functions.find_winning_percentage(combined_winner_list)
+
 
 def unknown_simulation_init(hole_cards_list, unknown_index, deck_list,
                             generate_boards, num, board_length, given_board,
@@ -87,6 +90,7 @@ def unknown_simulation_init(hole_cards_list, unknown_index, deck_list,
     unknown_simulation.given_board = given_board
     unknown_simulation.combined_winner_list = combined_winner_list
     unknown_simulation.combined_result_histograms = combined_result_histograms
+
 
 def unknown_simulation(new_hole_cards):
     # Extract parameters
@@ -102,7 +106,7 @@ def unknown_simulation(new_hole_cards):
     # Set simulation variables
     num_players = len(hole_cards_list)
     result_histograms, winner_list = [], [0] * (num_players + 1)
-    for _ in xrange(num_players):
+    for _ in range(num_players):
         result_histograms.append([0] * len(holdem_functions.hand_rankings))
     hole_cards_list[unknown_index] = new_hole_cards
     deck.remove(new_hole_cards[0])
@@ -122,6 +126,7 @@ def unknown_simulation(new_hole_cards):
                                        (proc_id * num_players + histogram_index)
                                        + index] += result
 
+
 def find_winner(generate_boards, deck, hole_cards, num, board_length,
                 given_board, winner_list, result_histograms):
     num_processes = multiprocessing.cpu_count()
@@ -132,12 +137,14 @@ def find_winner(generate_boards, deck, hole_cards, num, board_length,
                                           result_histograms))
     pool.map(simulation, generate_boards(deck, num, board_length))
 
+
 # Initialize shared variables for simulation
 def simulation_init(given_board, hole_cards, winner_list, result_histograms):
     simulation.given_board = given_board
     simulation.hole_cards = hole_cards
     simulation.winner_list = winner_list
     simulation.result_histograms = result_histograms
+
 
 # Separated function for each thread to execute while running
 def simulation(remaining_board):
@@ -158,7 +165,7 @@ def simulation(remaining_board):
     proc_id = int(proc_name.split("-")[-1]) % multiprocessing.cpu_count()
     # Create results data structure which tracks results of comparisons
     result_list = []
-    for _ in xrange(num_players):
+    for _ in range(num_players):
         result_list.append([])
     # Find the best possible poker hand given the created board and the
     # hole cards and save them in the results data structures
@@ -176,7 +183,8 @@ def simulation(remaining_board):
         result_histograms[len(holdem_functions.hand_rankings) *
                           (proc_id * num_players + index) + result[0]] += 1
 
+
 if __name__ == '__main__':
     start = time.time()
     main()
-    print "\nTime elapsed(seconds): ", time.time() - start
+    print("\nTime elapsed(seconds): ", time.time() - start)
