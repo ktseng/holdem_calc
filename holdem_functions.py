@@ -250,7 +250,7 @@ def compare_hands(result_list):
 # Print results
 def print_results(hole_cards, winner_list, result_histograms):
     float_iterations = float(sum(winner_list))
-    print "Winning Percentages:"
+    print ("Winning Percentages:")
     for index, hole_card in enumerate(hole_cards):
         winning_percentage = float(winner_list[index + 1]) / float_iterations
         if hole_card == (None, None):
